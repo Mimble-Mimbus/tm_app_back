@@ -1,34 +1,37 @@
 <?php
 
-namespace App\Entity\Abstract;
+namespace App\Entity;
 
 use App\Entity\Event;
 use App\Entity\Price;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\MappedSuperclass;
 
-#[MappedSuperclass]
-abstract class APaymentable
+#[ORM\Entity(repositoryClass: PaymentableRepository::class)]
+class Paymentable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    protected ?int $id = null;
-
+    private ?int $id = null;
+    
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
     #[ORM\Column]
     private ?string $type = null;
 
-    #[ORM\OneToMany(mappedBy: 'APaymentable', targetEntity: Price::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'paymentable', targetEntity: Price::class, orphanRemoval: true)]
     private Collection $prices;
 
-    #[ORM\ManyToOne(inversedBy: 'aPaymentable')]
+    #[ORM\ManyToOne(inversedBy: 'paymentable')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Event $event = null;
+
+    #[ORM\ManyToOne(inversedBy: 'paymentables')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TypePaymentable $typePaymentable = null;
 
     public function __construct()
     {
@@ -98,6 +101,18 @@ abstract class APaymentable
     public function setEvent(?Event $event): static
     {
         $this->event = $event;
+
+        return $this;
+    }
+
+    public function getTypePaymentable(): ?TypePaymentable
+    {
+        return $this->typePaymentable;
+    }
+
+    public function setTypePaymentable(?TypePaymentable $typePaymentable): static
+    {
+        $this->typePaymentable = $typePaymentable;
 
         return $this;
     }

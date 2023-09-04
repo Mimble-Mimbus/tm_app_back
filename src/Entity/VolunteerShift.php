@@ -2,8 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Abstract\AUser;
-use App\Entity\Abstract\AZone;
+use App\Entity\UserTM;
 use App\Repository\VolunteerShiftRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,7 +17,7 @@ class VolunteerShift
 
     #[ORM\ManyToOne(inversedBy: 'volunteerShifts')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?AUser $user = null;
+    private ?UserTM $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'volunteerShifts')]
     #[ORM\JoinColumn(nullable: false)]
@@ -26,7 +25,7 @@ class VolunteerShift
 
     #[ORM\ManyToOne(inversedBy: 'volunteerShifts')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?AZone $zone = null;
+    private ?Zone $zone = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $shiftStart = null;
@@ -42,12 +41,12 @@ class VolunteerShift
         return $this->id;
     }
 
-    public function getUser(): ?AUser
+    public function getUser(): ?UserTM
     {
         return $this->user;
     }
 
-    public function setUser(?AUser $user): static
+    public function setUser(?UserTM $user): static
     {
         $this->user = $user;
 
@@ -66,12 +65,12 @@ class VolunteerShift
         return $this;
     }
 
-    public function getZone(): ?AZone
+    public function getZone(): ?Zone
     {
         return $this->zone;
     }
 
-    public function setZone(?AZone $zone): static
+    public function setZone(?Zone $zone): static
     {
         $this->zone = $zone;
 

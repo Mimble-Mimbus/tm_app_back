@@ -2,29 +2,44 @@
 
 namespace App\Entity;
 
-use App\Entity\Abstract\APaymentable;
 use App\Entity\Abstract\AStructure;
-use App\Entity\Abstract\AZone;
+use App\Entity\Zone;
+use App\Entity\Paymentable;
 use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\AssociationOverride;
+use Doctrine\ORM\Mapping\AssociationOverrides;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinTable;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[AssociationOverrides([
+    new AssociationOverride(
+        name: 'urls',
+        joinColumns: [new JoinColumn(name: 'astructureevent_id')],
+        inverseJoinColumns: [new JoinColumn(name: 'urlevent_id')]
+    )])]
 class Event extends AStructure
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: OpenDay::class, orphanRemoval: true)]
     private Collection $openDays;
 
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: AZone::class, orphanRemoval: true)]
-    private Collection $aZones;
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Zone::class, orphanRemoval: true)]
+    private Collection $zones;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?organization $organization = null;
+    private ?Organization $organization = null;
 
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: APaymentable::class, orphanRemoval: true)]
-    private Collection $aPaymentable;
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Paymentable::class, orphanRemoval: true)]
+    private Collection $paymentable;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: VolunteerShift::class, orphanRemoval: true)]
     private Collection $volunteerShifts;
@@ -36,10 +51,15 @@ class Event extends AStructure
     {
         parent::__construct();
         $this->openDays = new ArrayCollection();
-        $this->aZones = new ArrayCollection();
-        $this->aPaymentable = new ArrayCollection();
+        $this->zones = new ArrayCollection();
+        $this->paymentable = new ArrayCollection();
         $this->volunteerShifts = new ArrayCollection();
         $this->reportings = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     /**
@@ -73,29 +93,29 @@ class Event extends AStructure
     }
 
     /**
-     * @return Collection<int, AZone>
+     * @return Collection<int, Zone>
      */
-    public function getAZones(): Collection
+    public function getZones(): Collection
     {
-        return $this->aZones;
+        return $this->zones;
     }
 
-    public function addAZone(AZone $aZone): static
+    public function addZone(Zone $zone): static
     {
-        if (!$this->aZones->contains($aZone)) {
-            $this->aZones->add($aZone);
-            $aZone->setEvent($this);
+        if (!$this->zones->contains($zone)) {
+            $this->zones->add($zone);
+            $zone->setEvent($this);
         }
 
         return $this;
     }
 
-    public function removeAZone(AZone $aZone): static
+    public function removeZone(Zone $zone): static
     {
-        if ($this->aZones->removeElement($aZone)) {
+        if ($this->zones->removeElement($zone)) {
             // set the owning side to null (unless already changed)
-            if ($aZone->getEvent() === $this) {
-                $aZone->setEvent(null);
+            if ($zone->getEvent() === $this) {
+                $zone->setEvent(null);
             }
         }
 
@@ -119,25 +139,25 @@ class Event extends AStructure
      */
     public function getAPaymentable(): Collection
     {
-        return $this->aPaymentable;
+        return $this->paymentable;
     }
 
-    public function addAPaymentable(APaymentable $aPaymentable): static
+    public function addAPaymentable(Paymentable $paymentable): static
     {
-        if (!$this->aPaymentable->contains($aPaymentable)) {
-            $this->aPaymentable->add($aPaymentable);
-            $aPaymentable->setEvent($this);
+        if (!$this->paymentable->contains($paymentable)) {
+            $this->paymentable->add($paymentable);
+            $paymentable->setEvent($this);
         }
 
         return $this;
     }
 
-    public function removeAPaymentable(APaymentable $aPaymentable): static
+    public function removeAPaymentable(Paymentable $paymentable): static
     {
-        if ($this->aPaymentable->removeElement($aPaymentable)) {
+        if ($this->paymentable->removeElement($paymentable)) {
             // set the owning side to null (unless already changed)
-            if ($aPaymentable->getEvent() === $this) {
-                $aPaymentable->setEvent(null);
+            if ($paymentable->getEvent() === $this) {
+                $paymentable->setEvent(null);
             }
         }
 

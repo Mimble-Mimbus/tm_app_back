@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use App\Entity\Abstract\AUser;
-use App\Entity\Abstract\AZone;
+use App\Entity\UserTM;
+use App\Entity\Zone;
 use App\Repository\ReportingRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,11 +18,11 @@ class Reporting
 
     #[ORM\ManyToOne(inversedBy: 'reportings')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?AZone $zone = null;
+    private ?Zone $zone = null;
 
     #[ORM\ManyToOne(inversedBy: 'reportings')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?AUser $user = null;
+    private ?UserTM $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'reportings')]
     #[ORM\JoinColumn(nullable: false)]
@@ -45,24 +45,24 @@ class Reporting
         return $this->id;
     }
 
-    public function getZone(): ?AZone
+    public function getZone(): ?Zone
     {
         return $this->zone;
     }
 
-    public function setZone(?AZone $zone): static
+    public function setZone(?Zone $zone): static
     {
         $this->zone = $zone;
 
         return $this;
     }
 
-    public function getUser(): ?AUser
+    public function getUser(): ?UserTM
     {
         return $this->user;
     }
 
-    public function setUser(?AUser $user): static
+    public function setUser(?UserTM $user): static
     {
         $this->user = $user;
 

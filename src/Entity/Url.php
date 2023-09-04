@@ -29,17 +29,17 @@ class Url
         return $this->id;
     }
 
-    public function getStructure(): ?AStructure
-    {
-        return $this->structure;
-    }
+    // public function getStructure(): ?AStructure
+    // {
+    //     return $this->structure;
+    // }
 
-    public function setStructure(?AStructure $structure): static
-    {
-        $this->structure = $structure;
+    // public function setStructure(?AStructure $structure): static
+    // {
+    //     $this->structure = $structure;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     public function getName(): ?string
     {

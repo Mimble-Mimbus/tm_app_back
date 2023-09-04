@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Abstract\APaymentable;
+use App\Entity\Paymentable;
 use App\Repository\PriceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,7 +22,7 @@ class Price
 
     #[ORM\ManyToOne(inversedBy: 'prices')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?APaymentable $APaymentable = null;
+    private ?Paymentable $paymentable = null;
 
     public function getId(): ?int
     {
@@ -53,14 +53,14 @@ class Price
         return $this;
     }
 
-    public function getAPaymentable(): ?APaymentable
+    public function getAPaymentable(): ?Paymentable
     {
-        return $this->APaymentable;
+        return $this->paymentable;
     }
 
-    public function setAPaymentable(?APaymentable $APaymentable): static
+    public function setAPaymentable(?Paymentable $paymentable): static
     {
-        $this->APaymentable = $APaymentable;
+        $this->paymentable = $paymentable;
 
         return $this;
     }

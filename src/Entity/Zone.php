@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Entity\Abstract;
+namespace App\Entity;
 
 use App\Entity\event;
+use App\Repository\ZoneRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\MappedSuperclass;
 
-#[MappedSuperclass]
-abstract class AZone
+#[ORM\Entity(repositoryClass: ZoneRepository::class)]
+class Zone
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    protected ?int $id = null;
+    private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'aZones')]
+    #[ORM\ManyToOne(inversedBy: 'zones')]
     #[ORM\JoinColumn(nullable: false)]
     private ?event $event = null;
 
@@ -50,13 +50,4 @@ abstract class AZone
 
         return $this;
     }
-
-    /**
-     * @return Collection<int, AActivity>
-     */
-    abstract public function getActivities(): Collection;
-
-    abstract public function addActivity(AActivity $activity): static;
-
-    abstract public function removeActivity(AActivity $activity): static;
 }

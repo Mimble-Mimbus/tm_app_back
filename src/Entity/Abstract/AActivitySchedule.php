@@ -10,11 +10,6 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 #[MappedSuperclass]
 abstract class AActivitySchedule
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    protected ?int $id = null;
-
     #[ORM\Column(nullable: true)]
     private ?int $duration = null;
 
@@ -23,11 +18,6 @@ abstract class AActivitySchedule
 
     #[ORM\Column]
     private ?bool $isCanceled = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     abstract public function getActivity(): ?AActivity;
 

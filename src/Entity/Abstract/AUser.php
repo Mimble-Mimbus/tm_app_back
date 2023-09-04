@@ -14,10 +14,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[MappedSuperclass]
 abstract class AUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    protected ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
@@ -49,10 +45,6 @@ abstract class AUser implements UserInterface, PasswordAuthenticatedUserInterfac
         $this->reportings = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getEmail(): ?string
     {

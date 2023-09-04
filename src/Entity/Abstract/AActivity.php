@@ -10,11 +10,6 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 #[MappedSuperclass]
 abstract class AActivity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    protected ?int $id = null;
-
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -35,15 +30,6 @@ abstract class AActivity
 
     #[ORM\Column]
     private ?bool $isCanceled = null;
-
-    #[ORM\ManyToOne(inversedBy: 'aActivities')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?AZone $aZone = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getName(): ?string
     {
@@ -128,6 +114,7 @@ abstract class AActivity
 
         return $this;
     }
+
     /**
      * @return Collection<int, AActivitySchedule>
      */
@@ -136,17 +123,4 @@ abstract class AActivity
     abstract public function addActivitySchedule(AActivitySchedule $activitySchedule): static;
 
     abstract public function removeActivitySchedule(AActivitySchedule $activitySchedule): static;
-
-    public function getAZone(): ?AZone
-    {
-        return $this->aZone;
-    }
-
-    public function setAZone(?AZone $aZone): static
-    {
-        $this->aZone = $aZone;
-
-        return $this;
-    }
-
 }
