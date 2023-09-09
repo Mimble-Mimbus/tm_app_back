@@ -2,14 +2,21 @@
 
 namespace App\Entity;
 
+use App\Entity\Abstract\AZone;
 use App\Repository\RpgZoneRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RpgZoneRepository::class)]
-class RpgZone extends Zone
+class RpgZone extends AZone
 {
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    public ?int $id = null;
+
     #[ORM\Column]
     private ?int $availableTables = null;
 
@@ -25,10 +32,18 @@ class RpgZone extends Zone
     #[ORM\OneToMany(mappedBy: 'rpgZone', targetEntity: RpgActivity::class)]
     private Collection $rpgActivities;
 
+    #[ORM\ManyToOne(inversedBy: 'rpgZones')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Event $event = null;
+
     public function __construct()
     {
-        parent::__construct();
         $this->rpgActivities = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     public function getAvailableTables(): ?int
@@ -105,6 +120,18 @@ class RpgZone extends Zone
                 $rpgActivity->setRpgZone(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEvent(): ?Event
+    {
+        return $this->event;
+    }
+
+    public function setEvent(?Event $event): static
+    {
+        $this->event = $event;
 
         return $this;
     }

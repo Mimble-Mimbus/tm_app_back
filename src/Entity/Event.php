@@ -49,6 +49,9 @@ class Event extends AStructure
     #[ORM\OneToOne(mappedBy: 'event', cascade: ['persist', 'remove'])]
     private ?RpgZone $rpgZone = null;
 
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: RpgZone::class)]
+    private Collection $rpgZones;
+
     public function __construct()
     {
         $this->openDays = new ArrayCollection();
@@ -59,6 +62,7 @@ class Event extends AStructure
         $this->urls = new ArrayCollection();
         $this->guilds = new ArrayCollection();
         $this->quests = new ArrayCollection();
+        $this->rpgZones = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -331,6 +335,36 @@ class Event extends AStructure
         }
 
         $this->rpgZone = $rpgZone;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RpgZone>
+     */
+    public function getRpgZones(): Collection
+    {
+        return $this->rpgZones;
+    }
+
+    public function addRpgZone(RpgZone $rpgZone): static
+    {
+        if (!$this->rpgZones->contains($rpgZone)) {
+            $this->rpgZones->add($rpgZone);
+            $rpgZone->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRpgZone(RpgZone $rpgZone): static
+    {
+        if ($this->rpgZones->removeElement($rpgZone)) {
+            // set the owning side to null (unless already changed)
+            if ($rpgZone->getEvent() === $this) {
+                $rpgZone->setEvent(null);
+            }
+        }
 
         return $this;
     }

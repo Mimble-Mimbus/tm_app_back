@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-use App\Entity\event;
+use App\Entity\Abstract\AZone;
+use App\Entity\Event;
 use App\Repository\ZoneRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,19 +12,16 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
 #[MappedSuperclass(repositoryClass: ZoneRepository::class)]
-class Zone
+class Zone extends AZone
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    protected ?int $id = null;
+    public ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'zones')]
     #[ORM\JoinColumn(nullable: false)]
-    protected ?event $event = null;
-
-    #[ORM\Column(length: 255)]
-    protected ?string $name = null;
+    private ?Event $event = null;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Entertainment::class)]
     private Collection $entertainments;
@@ -42,26 +40,14 @@ class Zone
         return $this->id;
     }
 
-    public function getEvent(): ?event
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
 
-    public function setEvent(?event $event): static
+    public function setEvent(?Event $event): static
     {
         $this->event = $event;
-
-        return $this;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
 
         return $this;
     }

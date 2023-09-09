@@ -107,4 +107,9 @@ class Organization extends AStructure
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->name;
+    }
 }
