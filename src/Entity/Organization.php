@@ -14,7 +14,7 @@ class Organization extends AStructure
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $email = null;
@@ -22,10 +22,13 @@ class Organization extends AStructure
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Event::class, orphanRemoval: true)]
     private Collection $events;
 
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Url::class)]
+    private Collection $urls;
+
     public function __construct()
     {
-        parent::__construct();
         $this->events = new ArrayCollection();
+        $this->urls = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -69,6 +72,36 @@ class Organization extends AStructure
             // set the owning side to null (unless already changed)
             if ($event->getOrganization() === $this) {
                 $event->setOrganization(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Url>
+     */
+    public function getUrls(): Collection
+    {
+        return $this->urls;
+    }
+
+    public function addUrl(Url $url): static
+    {
+        if (!$this->urls->contains($url)) {
+            $this->urls->add($url);
+            $url->setOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUrl(Url $url): static
+    {
+        if ($this->urls->removeElement($url)) {
+            // set the owning side to null (unless already changed)
+            if ($url->getOrganization() === $this) {
+                $url->setOrganization(null);
             }
         }
 

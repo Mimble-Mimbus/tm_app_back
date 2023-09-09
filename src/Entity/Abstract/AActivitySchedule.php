@@ -19,9 +19,6 @@ abstract class AActivitySchedule
     #[ORM\Column]
     private ?bool $isCanceled = null;
 
-    abstract public function getActivity(): ?AActivity;
-
-    abstract public function setActivity(?AActivity $aActivity): static;
 
     public function getDuration(): ?int
     {
@@ -64,8 +61,8 @@ abstract class AActivitySchedule
      */
     abstract public function getActivityReservations(): Collection;
 
-    abstract public function addActivityReservation(AActivityReservation $activityReservation): static;
+    abstract public function addActivityReservation($activityReservation): static;
 
-    abstract public function removeActivityReservation(AActivityReservation $activityReservation): static;
+    abstract public function removeActivityReservation($activityReservation): static;
 
 }

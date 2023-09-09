@@ -2,12 +2,14 @@
 
 namespace App\Entity\Abstract;
 
+use App\Entity\UserTM;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 
 #[MappedSuperclass]
 abstract class AActivityReservation
 {
+    
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -57,14 +59,6 @@ abstract class AActivityReservation
         return $this;
     }
 
-    abstract public function getUser(): AUser;
-
-    abstract public function setUser(AUser $user): static;
-
-    abstract public function getActivitySchedule(): ?AActivitySchedule;
-    
-    abstract public function setActivitySchedule(?AActivitySchedule $activitySchedule): static;
-    
     public function getBookings(): ?int
     {
         return $this->bookings;
@@ -76,4 +70,13 @@ abstract class AActivityReservation
 
         return $this;
     }
+    
+    abstract public function getUser();
+
+    abstract public function setUser($user): static;
+
+    abstract public function getActivitySchedule();
+    
+    abstract public function setActivitySchedule($activitySchedule): static;
+    
 }

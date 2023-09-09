@@ -9,24 +9,14 @@ use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\AssociationOverride;
-use Doctrine\ORM\Mapping\AssociationOverrides;
-use Doctrine\ORM\Mapping\JoinColumn;
-use Doctrine\ORM\Mapping\JoinTable;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-#[AssociationOverrides([
-    new AssociationOverride(
-        name: 'urls',
-        joinColumns: [new JoinColumn(name: 'astructureevent_id')],
-        inverseJoinColumns: [new JoinColumn(name: 'urlevent_id')]
-    )])]
 class Event extends AStructure
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: OpenDay::class, orphanRemoval: true)]
     private Collection $openDays;
@@ -47,14 +37,28 @@ class Event extends AStructure
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: Reporting::class)]
     private Collection $reportings;
 
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Url::class)]
+    private Collection $urls;
+
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Guild::class)]
+    private Collection $guilds;
+
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Quest::class)]
+    private Collection $quests;
+
+    #[ORM\OneToOne(mappedBy: 'event', cascade: ['persist', 'remove'])]
+    private ?RpgZone $rpgZone = null;
+
     public function __construct()
     {
-        parent::__construct();
         $this->openDays = new ArrayCollection();
         $this->zones = new ArrayCollection();
         $this->paymentable = new ArrayCollection();
         $this->volunteerShifts = new ArrayCollection();
         $this->reportings = new ArrayCollection();
+        $this->urls = new ArrayCollection();
+        $this->guilds = new ArrayCollection();
+        $this->quests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -220,6 +224,113 @@ class Event extends AStructure
                 $reporting->setEvent(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Url>
+     */
+    public function getUrls(): Collection
+    {
+        return $this->urls;
+    }
+
+    public function addUrl(Url $url): static
+    {
+        if (!$this->urls->contains($url)) {
+            $this->urls->add($url);
+            $url->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUrl(Url $url): static
+    {
+        if ($this->urls->removeElement($url)) {
+            // set the owning side to null (unless already changed)
+            if ($url->getEvent() === $this) {
+                $url->setEvent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Guild>
+     */
+    public function getGuilds(): Collection
+    {
+        return $this->guilds;
+    }
+
+    public function addGuild(Guild $guild): static
+    {
+        if (!$this->guilds->contains($guild)) {
+            $this->guilds->add($guild);
+            $guild->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGuild(Guild $guild): static
+    {
+        if ($this->guilds->removeElement($guild)) {
+            // set the owning side to null (unless already changed)
+            if ($guild->getEvent() === $this) {
+                $guild->setEvent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Quest>
+     */
+    public function getQuests(): Collection
+    {
+        return $this->quests;
+    }
+
+    public function addQuest(Quest $quest): static
+    {
+        if (!$this->quests->contains($quest)) {
+            $this->quests->add($quest);
+            $quest->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuest(Quest $quest): static
+    {
+        if ($this->quests->removeElement($quest)) {
+            // set the owning side to null (unless already changed)
+            if ($quest->getEvent() === $this) {
+                $quest->setEvent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getRpgZone(): ?RpgZone
+    {
+        return $this->rpgZone;
+    }
+
+    public function setRpgZone(RpgZone $rpgZone): static
+    {
+        // set the owning side of the relation if necessary
+        if ($rpgZone->getEvent() !== $this) {
+            $rpgZone->setEvent($this);
+        }
+
+        $this->rpgZone = $rpgZone;
 
         return $this;
     }

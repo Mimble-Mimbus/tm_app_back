@@ -5,6 +5,7 @@ namespace App\Entity\Abstract;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 
 #[MappedSuperclass]
@@ -115,12 +116,9 @@ abstract class AActivity
         return $this;
     }
 
-    /**
-     * @return Collection<int, AActivitySchedule>
-     */
     abstract public function getActivitieSchedules(): Collection;
 
-    abstract public function addActivitySchedule(AActivitySchedule $activitySchedule): static;
+    abstract public function addActivitySchedule($activitySchedule): static;
 
-    abstract public function removeActivitySchedule(AActivitySchedule $activitySchedule): static;
+    abstract public function removeActivitySchedule($activitySchedule): static;
 }
