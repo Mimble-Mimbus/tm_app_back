@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Event;
 use App\Entity\Price;
+use App\Repository\PaymentableRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,9 +19,6 @@ class Paymentable
     
     #[ORM\Column(length: 255)]
     private ?string $name = null;
-
-    #[ORM\Column]
-    private ?string $type = null;
 
     #[ORM\OneToMany(mappedBy: 'paymentable', targetEntity: Price::class, orphanRemoval: true)]
     private Collection $prices;
@@ -53,15 +51,6 @@ class Paymentable
         $this->name = $name;
     }
 
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
 
     /**
      * @return Collection<int, Price>

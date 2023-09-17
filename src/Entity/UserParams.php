@@ -16,6 +16,10 @@ class UserParams
     #[ORM\Column]
     private ?bool $allNotifications = null;
 
+    #[ORM\OneToOne(inversedBy: 'userParams', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?UserTM $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -29,6 +33,18 @@ class UserParams
     public function setAllNotifications(bool $allNotifications): static
     {
         $this->allNotifications = $allNotifications;
+
+        return $this;
+    }
+
+    public function getUser(): ?UserTM
+    {
+        return $this->user;
+    }
+
+    public function setUser(UserTM $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

@@ -53,12 +53,12 @@ class Price
         return $this;
     }
 
-    public function getAPaymentable(): ?Paymentable
+    public function getPaymentable(): ?Paymentable
     {
         return $this->paymentable;
     }
 
-    public function setAPaymentable(?Paymentable $paymentable): static
+    public function setPaymentable(?Paymentable $paymentable): static
     {
         $this->paymentable = $paymentable;
 

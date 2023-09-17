@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Structure;
 use App\Repository\UrlRepository;
 use Doctrine\ORM\Mapping as ORM;
 

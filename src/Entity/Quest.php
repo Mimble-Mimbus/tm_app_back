@@ -42,12 +42,12 @@ class Quest
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $password = null;
 
-    #[ORM\OneToMany(mappedBy: 'quest', targetEntity: FullfilledQuest::class)]
-    private Collection $fullfilledQuests;
+    #[ORM\OneToMany(mappedBy: 'quest', targetEntity: FulfilledQuest::class)]
+    private Collection $fulfilledQuests;
 
     public function __construct()
     {
-        $this->fullfilledQuests = new ArrayCollection();
+        $this->fulfilledQuests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -152,29 +152,29 @@ class Quest
     }
 
     /**
-     * @return Collection<int, FullfilledQuest>
+     * @return Collection<int, FulfilledQuest>
      */
-    public function getFullfilledQuests(): Collection
+    public function getFulfilledQuests(): Collection
     {
-        return $this->fullfilledQuests;
+        return $this->fulfilledQuests;
     }
 
-    public function addFullfilledQuest(FullfilledQuest $fullfilledQuest): static
+    public function addfulfilledQuest(FulfilledQuest $fulfilledQuest): static
     {
-        if (!$this->fullfilledQuests->contains($fullfilledQuest)) {
-            $this->fullfilledQuests->add($fullfilledQuest);
-            $fullfilledQuest->setQuest($this);
+        if (!$this->fulfilledQuests->contains($fulfilledQuest)) {
+            $this->fulfilledQuests->add($fulfilledQuest);
+            $fulfilledQuest->setQuest($this);
         }
 
         return $this;
     }
 
-    public function removeFullfilledQuest(FullfilledQuest $fullfilledQuest): static
+    public function removeFulfilledQuest(FulfilledQuest $fulfilledQuest): static
     {
-        if ($this->fullfilledQuests->removeElement($fullfilledQuest)) {
+        if ($this->fulfilledQuests->removeElement($fulfilledQuest)) {
             // set the owning side to null (unless already changed)
-            if ($fullfilledQuest->getQuest() === $this) {
-                $fullfilledQuest->setQuest(null);
+            if ($fulfilledQuest->getQuest() === $this) {
+                $fulfilledQuest->setQuest(null);
             }
         }
 

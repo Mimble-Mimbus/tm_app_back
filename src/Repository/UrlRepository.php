@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\AUser;
+use App\Entity\Url;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<AUser>
+ * @extends ServiceEntityRepository<Url>
  *
- * @method AUser|null find($id, $lockMode = null, $lockVersion = null)
- * @method AUser|null findOneBy(array $criteria, array $orderBy = null)
- * @method AUser[]    findAll()
- * @method AUser[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Url|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Url|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Url[]    findAll()
+ * @method Url[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AUserRepository extends ServiceEntityRepository
+class UrlRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, AUser::class);
+        parent::__construct($registry, Url::class);
     }
 
 //    /**
-//     * @return AUser[] Returns an array of AUser objects
+//     * @return Url[] Returns an array of Url objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -36,7 +36,7 @@ class AUserRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?AUser
+//    public function findOneBySomeField($value): ?Url
 //    {
 //        return $this->createQueryBuilder('a')
 //            ->andWhere('a.exampleField = :val')

@@ -36,6 +36,10 @@ class RpgZone extends AZone
     #[ORM\JoinColumn(nullable: false)]
     private ?Event $event = null;
 
+    #[ORM\OneToOne(inversedBy: 'rpgZone', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Zone $zone = null;
+
     public function __construct()
     {
         $this->rpgActivities = new ArrayCollection();
@@ -132,6 +136,18 @@ class RpgZone extends AZone
     public function setEvent(?Event $event): static
     {
         $this->event = $event;
+
+        return $this;
+    }
+
+    public function getZone(): ?Zone
+    {
+        return $this->zone;
+    }
+
+    public function setZone(Zone $zone): static
+    {
+        $this->zone = $zone;
 
         return $this;
     }

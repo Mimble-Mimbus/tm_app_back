@@ -19,20 +19,22 @@ class UserTM extends AUser
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: EntertainmentReservation::class)]
     private Collection $entertainmentReservations;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: FullfilledQuest::class)]
-    private Collection $fullfilledQuests;
-
     #[ORM\OneToMany(mappedBy: 'userGm', targetEntity: RpgTable::class)]
     private Collection $rpgTables;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: RpgReservation::class)]
     private Collection $rpgReservations;
 
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?UserParams $userParams = null;
+
+    #[ORM\ManyToOne(inversedBy: 'userTMs')]
+    private ?Guild $guild = null;
+
     public function __construct()
     {
         parent::__construct();
         $this->entertainmentReservations = new ArrayCollection();
-        $this->fullfilledQuests = new ArrayCollection();
         $this->rpgTables = new ArrayCollection();
         $this->rpgReservations = new ArrayCollection();
     }
@@ -66,36 +68,6 @@ class UserTM extends AUser
             // set the owning side to null (unless already changed)
             if ($entertainmentReservation->getUser() === $this) {
                 $entertainmentReservation->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, FullfilledQuest>
-     */
-    public function getFullfilledQuests(): Collection
-    {
-        return $this->fullfilledQuests;
-    }
-
-    public function addFullfilledQuest(FullfilledQuest $fullfilledQuest): static
-    {
-        if (!$this->fullfilledQuests->contains($fullfilledQuest)) {
-            $this->fullfilledQuests->add($fullfilledQuest);
-            $fullfilledQuest->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFullfilledQuest(FullfilledQuest $fullfilledQuest): static
-    {
-        if ($this->fullfilledQuests->removeElement($fullfilledQuest)) {
-            // set the owning side to null (unless already changed)
-            if ($fullfilledQuest->getUser() === $this) {
-                $fullfilledQuest->setUser(null);
             }
         }
 
@@ -158,6 +130,35 @@ class UserTM extends AUser
                 $rpgReservation->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUserParams(): ?UserParams
+    {
+        return $this->userParams;
+    }
+
+    public function setUserParams(UserParams $userParams): static
+    {
+        // set the owning side of the relation if necessary
+        if ($userParams->getUser() !== $this) {
+            $userParams->setUser($this);
+        }
+
+        $this->userParams = $userParams;
+
+        return $this;
+    }
+
+    public function getGuild(): ?Guild
+    {
+        return $this->guild;
+    }
+
+    public function setGuild(?Guild $guild): static
+    {
+        $this->guild = $guild;
 
         return $this;
     }

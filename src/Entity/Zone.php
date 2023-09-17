@@ -29,6 +29,9 @@ class Zone extends AZone
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quest::class)]
     private Collection $quests;
 
+    #[ORM\OneToOne(mappedBy: 'zone', cascade: ['persist', 'remove'])]
+    private ?RpgZone $rpgZone = null;
+
     public function __construct()
     {
         $this->entertainments = new ArrayCollection();
@@ -108,6 +111,23 @@ class Zone extends AZone
                 $quest->setZone(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRpgZone(): ?RpgZone
+    {
+        return $this->rpgZone;
+    }
+
+    public function setRpgZone(RpgZone $rpgZone): static
+    {
+        // set the owning side of the relation if necessary
+        if ($rpgZone->getZone() !== $this) {
+            $rpgZone->setZone($this);
+        }
+
+        $this->rpgZone = $rpgZone;
 
         return $this;
     }

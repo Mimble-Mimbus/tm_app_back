@@ -19,11 +19,22 @@ class EntertainmentReservation extends AActivityReservation
     private ?EntertainmentSchedule $entertainmentSchedule = null;
 
     #[ORM\ManyToOne(inversedBy: 'entertainmentReservations')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?UserTM $user = null;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getEntertainmentSchedule(): EntertainmentSchedule
+    {
+        return $this->getActivitySchedule();
+    }
+
+    public function setEntertainmentSchedule(EntertainmentSchedule $entertainmentSchedule): static
+    {
+        return $this->setActivitySchedule($entertainmentSchedule);
     }
 
     public function getActivitySchedule(): EntertainmentSchedule

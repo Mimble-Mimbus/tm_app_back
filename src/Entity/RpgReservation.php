@@ -19,6 +19,7 @@ class RpgReservation extends AActivityReservation
     private ?RpgTable $rpgTable = null;
 
     #[ORM\ManyToOne(inversedBy: 'rpgReservations')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?UserTM $user = null;
 
     public function getId(): ?int
@@ -29,6 +30,16 @@ class RpgReservation extends AActivityReservation
     public function getActivitySchedule(): ?RpgTable
     {
         return $this->rpgTable;
+    }
+
+    public function getRpgTable()
+    {
+        return $this->getActivitySchedule();
+    }
+
+    public function setRpgTable(RpgTable $rpgTable)
+    {
+        $this->setActivitySchedule($rpgTable);
     }
 
     public function setActivitySchedule($rpgTable): static

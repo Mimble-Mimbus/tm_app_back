@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\FullfilledQuest;
+use App\Entity\FulfilledQuest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<FullfilledQuest>
+ * @extends ServiceEntityRepository<FulfilledQuest>
  *
- * @method FullfilledQuest|null find($id, $lockMode = null, $lockVersion = null)
- * @method FullfilledQuest|null findOneBy(array $criteria, array $orderBy = null)
- * @method FullfilledQuest[]    findAll()
- * @method FullfilledQuest[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method FulfilledQuest|null find($id, $lockMode = null, $lockVersion = null)
+ * @method FulfilledQuest|null findOneBy(array $criteria, array $orderBy = null)
+ * @method FulfilledQuest[]    findAll()
+ * @method FulfilledQuest[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class FullfilledQuestRepository extends ServiceEntityRepository
+class FulfilledQuestRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, FullfilledQuest::class);
+        parent::__construct($registry, FulfilledQuest::class);
     }
 
 //    /**
-//     * @return FullfilledQuest[] Returns an array of FullfilledQuest objects
+//     * @return FulfilledQuest[] Returns an array of FulfilledQuest objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -36,7 +36,7 @@ class FullfilledQuestRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?FullfilledQuest
+//    public function findOneBySomeField($value): ?FulfilledQuest
 //    {
 //        return $this->createQueryBuilder('f')
 //            ->andWhere('f.exampleField = :val')

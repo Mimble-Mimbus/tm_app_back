@@ -32,9 +32,17 @@ class Guild
     #[ORM\OneToMany(mappedBy: 'guild', targetEntity: Quest::class)]
     private Collection $quests;
 
+    #[ORM\OneToMany(mappedBy: 'guild', targetEntity: UserTM::class)]
+    private Collection $userTMs;
+
+    #[ORM\OneToMany(mappedBy: 'userGuild', targetEntity: FulfilledQuest::class)]
+    private Collection $fulfilledQuests;
+
     public function __construct()
     {
         $this->quests = new ArrayCollection();
+        $this->userTMs = new ArrayCollection();
+        $this->fulfilledQuests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -114,6 +122,68 @@ class Guild
             // set the owning side to null (unless already changed)
             if ($quest->getGuild() === $this) {
                 $quest->setGuild(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+
+    /**
+     * @return Collection<int, UserTM>
+     */
+    public function getUserTMs(): Collection
+    {
+        return $this->userTMs;
+    }
+
+    public function addUserTM(UserTM $userTM): static
+    {
+        if (!$this->userTMs->contains($userTM)) {
+            $this->userTMs->add($userTM);
+            $userTM->setGuild($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserTM(UserTM $userTM): static
+    {
+        if ($this->userTMs->removeElement($userTM)) {
+            // set the owning side to null (unless already changed)
+            if ($userTM->getGuild() === $this) {
+                $userTM->setGuild(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FulfilledQuest>
+     */
+    public function getFulfilledQuests(): Collection
+    {
+        return $this->fulfilledQuests;
+    }
+
+    public function addFulfilledQuest(FulfilledQuest $fulfilledQuest): static
+    {
+        if (!$this->fulfilledQuests->contains($fulfilledQuest)) {
+            $this->fulfilledQuests->add($fulfilledQuest);
+            $fulfilledQuest->setUserGuild($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFulfilledQuest(FulfilledQuest $fulfilledQuest): static
+    {
+        if ($this->fulfilledQuests->removeElement($fulfilledQuest)) {
+            // set the owning side to null (unless already changed)
+            if ($fulfilledQuest->getUserGuild() === $this) {
+                $fulfilledQuest->setUserGuild(null);
             }
         }
 
