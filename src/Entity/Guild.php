@@ -35,14 +35,14 @@ class Guild
     #[ORM\OneToMany(mappedBy: 'guild', targetEntity: UserTM::class)]
     private Collection $userTMs;
 
-    #[ORM\OneToMany(mappedBy: 'userGuild', targetEntity: FulfilledQuest::class)]
-    private Collection $fulfilledQuests;
+    #[ORM\OneToMany(mappedBy: 'userGuild', targetEntity: StartedQuest::class)]
+    private Collection $startedQuests;
 
     public function __construct()
     {
         $this->quests = new ArrayCollection();
         $this->userTMs = new ArrayCollection();
-        $this->fulfilledQuests = new ArrayCollection();
+        $this->startedQuests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -161,29 +161,29 @@ class Guild
     }
 
     /**
-     * @return Collection<int, FulfilledQuest>
+     * @return Collection<int, StartedQuest>
      */
-    public function getFulfilledQuests(): Collection
+    public function getStartedQuests(): Collection
     {
-        return $this->fulfilledQuests;
+        return $this->startedQuests;
     }
 
-    public function addFulfilledQuest(FulfilledQuest $fulfilledQuest): static
+    public function addStartedQuest(StartedQuest $startedQuest): static
     {
-        if (!$this->fulfilledQuests->contains($fulfilledQuest)) {
-            $this->fulfilledQuests->add($fulfilledQuest);
-            $fulfilledQuest->setUserGuild($this);
+        if (!$this->startedQuests->contains($startedQuest)) {
+            $this->startedQuests->add($startedQuest);
+            $startedQuest->setUserGuild($this);
         }
 
         return $this;
     }
 
-    public function removeFulfilledQuest(FulfilledQuest $fulfilledQuest): static
+    public function removeStartedQuest(StartedQuest $startedQuest): static
     {
-        if ($this->fulfilledQuests->removeElement($fulfilledQuest)) {
+        if ($this->startedQuests->removeElement($startedQuest)) {
             // set the owning side to null (unless already changed)
-            if ($fulfilledQuest->getUserGuild() === $this) {
-                $fulfilledQuest->setUserGuild(null);
+            if ($startedQuest->getUserGuild() === $this) {
+                $startedQuest->setUserGuild(null);
             }
         }
 

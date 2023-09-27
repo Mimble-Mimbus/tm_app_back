@@ -7,7 +7,7 @@ use App\Factory\EntertainmentReservationFactory;
 use App\Factory\EntertainmentScheduleFactory;
 use App\Factory\EntertainmentTypeFactory;
 use App\Factory\EventFactory;
-use App\Factory\FulfilledQuestFactory;
+use App\Factory\StartedQuestFactory;
 use App\Factory\GuildFactory;
 use App\Factory\OpenDayFactory;
 use App\Factory\OrganizationFactory;
@@ -122,7 +122,7 @@ class AppFixtures extends Fixture
             ];
         });
 
-        FulfilledQuestFactory::createMany(50, function () {
+        StartedQuestFactory::createMany(50, function () {
             return [
                 'quest' => QuestFactory::random(),
                 'user' => UserTMFactory::random(),

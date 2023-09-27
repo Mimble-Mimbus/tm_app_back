@@ -46,8 +46,26 @@ final class StartedQuestFactory extends ModelFactory
      */
     protected function getDefaults(): array
     {
+        $fulfilled = self::faker()->boolean();
+        $aborted = false;
+        $comment = null;
+        $difficulty = null;
+
+        if (!$fulfilled) {
+            $aborted = self::faker()->boolean();
+        }
+
+        if($aborted) {
+            $comment = self::faker()->text();
+            $difficulty = self::faker()->numberBetween(0, 5);
+        }
+
         return [
             'date' => self::faker()->dateTime(),
+            'isFulfilled' => $fulfilled,
+            'isAborted' => $aborted,
+            'difficulty' => $difficulty,
+            'comment' => $comment
             //'quest' => QuestFactory::new(),
             //'user' => UserTMFactory::new(),
             //'userGuild' => self::faker()->randomNumber(),
@@ -60,7 +78,7 @@ final class StartedQuestFactory extends ModelFactory
     protected function initialize(): self
     {
         return $this
-            // ->afterInstantiate(function(StartedQuest $fulfilledQuest): void {})
+            // ->afterInstantiate(function(StartedQuest $startedQuest): void {})
         ;
     }
 
