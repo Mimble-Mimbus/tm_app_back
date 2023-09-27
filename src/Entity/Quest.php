@@ -42,12 +42,12 @@ class Quest
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $password = null;
 
-    #[ORM\OneToMany(mappedBy: 'quest', targetEntity: FulfilledQuest::class)]
-    private Collection $fulfilledQuests;
+    #[ORM\OneToMany(mappedBy: 'quest', targetEntity: StartedQuest::class)]
+    private Collection $startedQuests;
 
     public function __construct()
     {
-        $this->fulfilledQuests = new ArrayCollection();
+        $this->startedQuests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -152,29 +152,29 @@ class Quest
     }
 
     /**
-     * @return Collection<int, FulfilledQuest>
+     * @return Collection<int, StartedQuest>
      */
-    public function getFulfilledQuests(): Collection
+    public function getStartedQuests(): Collection
     {
-        return $this->fulfilledQuests;
+        return $this->startedQuests;
     }
 
-    public function addfulfilledQuest(FulfilledQuest $fulfilledQuest): static
+    public function addstartedQuest(StartedQuest $startedQuest): static
     {
-        if (!$this->fulfilledQuests->contains($fulfilledQuest)) {
-            $this->fulfilledQuests->add($fulfilledQuest);
-            $fulfilledQuest->setQuest($this);
+        if (!$this->startedQuests->contains($startedQuest)) {
+            $this->startedQuests->add($startedQuest);
+            $startedQuest->setQuest($this);
         }
 
         return $this;
     }
 
-    public function removeFulfilledQuest(FulfilledQuest $fulfilledQuest): static
+    public function removeStartedQuest(StartedQuest $startedQuest): static
     {
-        if ($this->fulfilledQuests->removeElement($fulfilledQuest)) {
+        if ($this->startedQuests->removeElement($startedQuest)) {
             // set the owning side to null (unless already changed)
-            if ($fulfilledQuest->getQuest() === $this) {
-                $fulfilledQuest->setQuest(null);
+            if ($startedQuest->getQuest() === $this) {
+                $startedQuest->setQuest(null);
             }
         }
 
