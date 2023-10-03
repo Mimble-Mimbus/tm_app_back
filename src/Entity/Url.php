@@ -12,7 +12,7 @@ class Url
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-/* 
+    /* 
     #[ORM\ManyToOne(inversedBy: 'urls')]
     #[ORM\JoinColumn(nullable: false)]
     protected ?Structure $structure = null; */
@@ -92,5 +92,10 @@ class Url
         $this->organization = $organization;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->name;
     }
 }

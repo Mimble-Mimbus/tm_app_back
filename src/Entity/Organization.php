@@ -22,7 +22,7 @@ class Organization extends AStructure
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Event::class, orphanRemoval: true)]
     private Collection $events;
 
-    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Url::class)]
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Url::class, cascade: ["persist"])]
     private Collection $urls;
 
     public function __construct()
