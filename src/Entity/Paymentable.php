@@ -16,7 +16,7 @@ class Paymentable
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-    
+
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -64,7 +64,7 @@ class Paymentable
     {
         if (!$this->prices->contains($price)) {
             $this->prices->add($price);
-            $price->setAPaymentable($this);
+            $price->setPaymentable($this);
         }
 
         return $this;
@@ -74,8 +74,8 @@ class Paymentable
     {
         if ($this->prices->removeElement($price)) {
             // set the owning side to null (unless already changed)
-            if ($price->getAPaymentable() === $this) {
-                $price->setAPaymentable(null);
+            if ($price->getPaymentable() === $this) {
+                $price->setPaymentable(null);
             }
         }
 
@@ -104,5 +104,10 @@ class Paymentable
         $this->typePaymentable = $typePaymentable;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->name;
     }
 }

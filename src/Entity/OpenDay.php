@@ -64,4 +64,9 @@ class OpenDay
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return date_format($this->dayStart, 'd-m-Y H:s') . ' - ' . date_format($this->dayEnd, 'd-m-Y H:s');
+    }
 }

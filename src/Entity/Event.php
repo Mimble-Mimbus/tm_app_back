@@ -9,6 +9,7 @@ use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event extends AStructure
@@ -16,12 +17,15 @@ class Event extends AStructure
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('main')]
     protected ?int $id = null;
 
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: OpenDay::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: OpenDay::class, orphanRemoval: true, cascade: ['persist'])]
+    #[Groups('main')]
     private Collection $openDays;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: Zone::class, orphanRemoval: true)]
+    #[Groups('main')]
     private Collection $zones;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
@@ -29,34 +33,42 @@ class Event extends AStructure
     private ?Organization $organization = null;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: Paymentable::class, orphanRemoval: true)]
-    private Collection $paymentable;
+    #[Groups('main')]
+    private Collection $paymentables;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: VolunteerShift::class, orphanRemoval: true)]
+    #[Groups('main')]
     private Collection $volunteerShifts;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: Reporting::class)]
+    #[Groups('main')]
     private Collection $reportings;
 
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Url::class)]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Url::class, cascade: ['persist'])]
+    #[Groups('main')]
     private Collection $urls;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: Guild::class)]
+    #[Groups('main')]
     private Collection $guilds;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: Quest::class)]
+    #[Groups('main')]
     private Collection $quests;
 
     #[ORM\OneToOne(mappedBy: 'event', cascade: ['persist', 'remove'])]
+    #[Groups('main')]
     private ?RpgZone $rpgZone = null;
 
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: RpgZone::class)]
+    #[Groups('main')]
     private Collection $rpgZones;
 
     public function __construct()
     {
         $this->openDays = new ArrayCollection();
         $this->zones = new ArrayCollection();
-        $this->paymentable = new ArrayCollection();
+        $this->paymentables = new ArrayCollection();
         $this->volunteerShifts = new ArrayCollection();
         $this->reportings = new ArrayCollection();
         $this->urls = new ArrayCollection();
@@ -143,26 +155,26 @@ class Event extends AStructure
     }
 
     /**
-     * @return Collection<int, APaymentable>
+     * @return Collection<int, Paymentable>
      */
-    public function getAPaymentable(): Collection
+    public function getPaymentables(): Collection
     {
-        return $this->paymentable;
+        return $this->paymentables;
     }
 
-    public function addAPaymentable(Paymentable $paymentable): static
+    public function addPaymentable(Paymentable $paymentable): static
     {
-        if (!$this->paymentable->contains($paymentable)) {
-            $this->paymentable->add($paymentable);
+        if (!$this->paymentables->contains($paymentable)) {
+            $this->paymentables->add($paymentable);
             $paymentable->setEvent($this);
         }
 
         return $this;
     }
 
-    public function removeAPaymentable(Paymentable $paymentable): static
+    public function removePaymentable(Paymentable $paymentable): static
     {
-        if ($this->paymentable->removeElement($paymentable)) {
+        if ($this->paymentables->removeElement($paymentable)) {
             // set the owning side to null (unless already changed)
             if ($paymentable->getEvent() === $this) {
                 $paymentable->setEvent(null);
@@ -367,5 +379,10 @@ class Event extends AStructure
         }
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->name;
     }
 }

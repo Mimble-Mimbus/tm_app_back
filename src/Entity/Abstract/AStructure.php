@@ -14,7 +14,7 @@ abstract class AStructure
     #[ORM\Column(length: 255)]
     protected ?string $name = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'text')]
     protected ?string $presentation = null;
 
 
@@ -41,6 +41,6 @@ abstract class AStructure
     abstract public function getUrls(): Collection;
 
     abstract public function addUrl(Url $url): static;
-    
+
     abstract public function removeUrl(Url $url): static;
 }
