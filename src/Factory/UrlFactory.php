@@ -47,7 +47,7 @@ final class UrlFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'name' => self::faker()->word(),
+            'name' => self::faker()->randomElement(['twitter', 'instagram', 'site internet', 'facebook', 'discord', 'tiktok']),
             'url' => self::faker()->url(),
         ];
     }

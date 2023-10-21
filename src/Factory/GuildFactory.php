@@ -49,8 +49,8 @@ final class GuildFactory extends ModelFactory
         return [
             'description' => self::faker()->text(),
             //'event' => EventFactory::new(),
-            'name' => self::faker()->word(),
-            'points' => self::faker()->numberBetween(0, 500),
+            'name' => 'Guilde '. self::faker()->unique()->word(),
+            'points' => self::faker()->numberBetween(0, 1000),
         ];
     }
 

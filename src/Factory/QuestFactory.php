@@ -51,8 +51,8 @@ final class QuestFactory extends ModelFactory
             'infos' => self::faker()->text(),
             'isSecret' => self::faker()->boolean(),
             'password' => self::faker()->text(255),
-            'points' => self::faker()->randomNumber(),
-            'title' => self::faker()->text(255),
+            'points' => self::faker()->numberBetween(100, 600),
+            'title' => 'Quête '. self::faker()->unique()->words(3, true),
             //'zone' => ZoneFactory::new(),
         ];
     }

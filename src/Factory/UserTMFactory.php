@@ -49,7 +49,7 @@ final class UserTMFactory extends ModelFactory
     {
         $phone = '06' . rand(10000000, 99999999);
         return [
-            'email' => self::faker()->safeEmail(),
+            'email' => self::faker()->unique()->safeEmail(),
             'name' => self::faker()->userName(),
             'password' => 'app1234',
             'roles' => [],

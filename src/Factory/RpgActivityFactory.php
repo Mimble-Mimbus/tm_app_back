@@ -51,7 +51,7 @@ final class RpgActivityFactory extends ModelFactory
             'duration' => self::faker()->numberBetween(3, 5),
             'isCanceled' => self::faker()->boolean(),
             'maxNumberSeats' => self::faker()->randomNumber(3, 5),
-            'name' => self::faker()->words(5, true),
+            'name' => self::faker()->unique()->words(5, true),
             'onReservation' => self::faker()->boolean(),
         ];
     }

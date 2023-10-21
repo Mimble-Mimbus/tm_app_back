@@ -52,7 +52,7 @@ final class EntertainmentFactory extends ModelFactory
             //'entertainmentType' => EntertainmentTypeFactory::new(),
             'isCanceled' => self::faker()->boolean(),
             'maxNumberSeats' => self::faker()->numberBetween(2, 50),
-            'name' => self::faker()->unique()->words(rand(1, 6), true),
+            'name' => 'Animation '. self::faker()->unique()->words(rand(1, 6), true),
             'onReservation' => self::faker()->boolean(),
             //'zone' => ZoneFactory::new(),
         ];
