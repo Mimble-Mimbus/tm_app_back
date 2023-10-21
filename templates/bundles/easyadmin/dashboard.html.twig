@@ -1,18 +1,52 @@
 {% extends "@EasyAdmin/page/content.html.twig" %}
 
 {% block content_title %}
-    Tableau de bord
+	Tableau de bord
 {% endblock %}
 
 {% block main %}
+	<div class="select-settings">
+		{% if chosen_filter != null %}
+            <h3>Filtre appliqué : {{ chosen_filter }}</h3>
+            <a href="{{ path('admin_dashboard_reset_filter') }}">Réinitialiser</a>
+
+			{% else %}
+				<h3>Filtrer selon :</h3>
+				<form data-controller="dashboard">
+					<div class="radio-filter">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="filter-datas" id="filter-datas-organization" value="organization">
+							<label class="form-check-label" for="filter-datas-organization">
+								Une organisation
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="filter-datas" id="filter-datas-event" value="event">
+							<label class="form-check-label" for="filter-datas-event">
+								Un événement
+							</label>
+						</div>
+					</div>
+					<div id="include-select"></div>
+					<button class="btn" type="submit">Filtrer</button>
+				</form>
+		{% endif %}
+	</div>
 	<div class="stats-dashboard">
-    <div class="stats-card">
-        Nombre d'utilisateurs : {{ users_count }}
-    </div>
-    <div class="stats-card">
-        Prochain évènement : {{ next_event.name }}
-    </div>
+		<div class="stats-card">
+			Nombre d'utilisateurs :
+			{{ users_count }}
+		</div>
+		{% if current_event != null %}
+			<div class="stats-card">
+				Evénement en cours :
+				{{ current_event.name }}
+			</div>
+		{% endif %}
 
-    </div>
+		<div class="stats-card">
+			Prochain évènement :
+			{{ next_event.name }}
+		</div>
+	</div>
 {% endblock %}
-
