@@ -48,7 +48,7 @@ final class OrganizationFactory extends ModelFactory
     {
         return [
             'email' => self::faker()->safeEmail(),
-            'name' => self::faker()->words(2, true),
+            'name' => 'Organisation '. self::faker()->unique()->word(),
             'presentation' => self::faker()->paragraph(),
         ];
     }

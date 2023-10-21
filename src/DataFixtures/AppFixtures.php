@@ -31,27 +31,36 @@ use App\Factory\ZoneFactory;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\Validator\Constraints\Length;
 
 class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-
-        $organization = OrganizationFactory::createOne([
-            'urls' => UrlFactory::createMany(3)
+        UserTMFactory::createOne([
+            'name' => 'tmadmin',
+            'email' => 'admin@dev.com',
+            'roles' => ['ROLE_ADMIN'],
         ]);
 
-        $event = EventFactory::createOne([
-            'organization' => $organization,
-            'urls' => UrlFactory::createMany(2)
-        ]);
+        OrganizationFactory::createMany(3, function () {
+            return [
+                'urls' => UrlFactory::createMany(3)
+            ];
+        });
 
+        $events = EventFactory::createMany(7, function () {
+            return [
+                'organization' => OrganizationFactory::random(),
+                'urls' => UrlFactory::createMany(2)
+            ];
+        });
 
         TypePaymentableFactory::createMany(5);
 
-        PaymentableFactory::createMany(20, function () use ($event) {
+        PaymentableFactory::createMany(20, function () {
             return [
-                'event' => $event,
+                'event' => EventFactory::random(),
                 'typePaymentable' => TypePaymentableFactory::random()
             ];
         });
@@ -62,71 +71,90 @@ class AppFixtures extends Fixture
             ];
         });
 
-        $starts = ['2024-01-01 8:00', '2024-01-02 8:00', '2024-01-03 8:00'];
-        $ends = ['2024-01-01 20:00', '2024-01-02 20:00', '2024-01-03 20:00'];
-        foreach ($starts as $i => $v) {
-            OpenDayFactory::createOne([
-                'dayStart' => new DateTime($v),
-                'dayEnd' => new DateTime($ends[$i]),
-                'event' => $event
-            ]);
-        };
+        foreach ($events as $event) {
+            $year = rand(2023, 2026);
+            $month = rand(01, 12);
+            $starts = [$year . '-' . $month . '-01 8:00', $year . '-' . $month . '-01 8:00', $year . '-' . $month . '-01 8:00'];
+            $ends = [$year . '-' . $month . '-01 20:00', $year . '-' . $month . '-01 20:00', $year . '-' . $month . '-01 20:00'];
+            foreach ($starts as $i => $v) {
+                OpenDayFactory::createOne([
+                    'dayStart' => new DateTime($v),
+                    'dayEnd' => new DateTime($ends[$i]),
+                    'event' => $event
+                ]);
+            };
 
-        $zones = ZoneFactory::createMany(6, function () use ($event) {
-            return [
-                'event' => $event
-            ];
-        });
+            ZoneFactory::createMany(5, function () use ($event) {
+                return [
+                    'event' => $event
+                ];
+            });
 
-        GuildFactory::createMany(5, function () use ($event) {
-            return [
-                'event' => $event
-            ];
-        });
+            GuildFactory::createMany(rand(3, 6), function () use ($event) {
+                return [
+                    'event' => $event
+                ];
+            });
 
-        UserTMFactory::createMany(20, function () {
+            QuestFactory::createMany(rand(5, 15), function () use ($event) {
+                return [
+                    'event' => $event,
+                    'zone' => ZoneFactory::random(['event' => $event])
+                ];
+            });
+        }
+
+        UserTMFactory::createMany(40, function () {
             $setGuild = rand(0, 1);
             return [
+                'roles' => ['ROLE_USER', 'ROLE_VISITOR'],
                 'guild' => $setGuild == 1 ? GuildFactory::random() : null
             ];
         });
 
-        UserTMFactory::createOne([
-            'name' => 'tmadmin',
-            'email' => 'admin@dev.com',
-            'roles' => ['ROLE_ADMIN'],
-        ]);
+        $volunteers = UserTMFactory::createMany(10, function () {
+            return [
+                'roles' => ['ROLE_USER', 'ROLE_VOLUNTEER'],
+                'guild' => null
+            ];
+        });
 
-        ReportingFactory::createMany(10, function () use ($event) {
+        ReportingFactory::createMany(15, function () {
+            $event = EventFactory::random();
             return [
                 'event' => $event,
-                'zone' => ZoneFactory::random(),
+                'zone' => ZoneFactory::random(['event' => $event]),
                 'user' => UserTMFactory::random()
             ];
         });
 
+        VolunteerShiftFactory::createMany(25, function () use ($volunteers) {
+            $event = EventFactory::random();
+            $open = $event->getOpenDays()[rand(0, 2)];
 
+            $shiftStart = rand($open->getDayStart()->getTimestamp(), $open->getDayEnd()->getTimestamp());
+            $shiftEnd = rand($shiftStart, $open->getDayEnd()->getTimestamp());
 
-        VolunteerShiftFactory::createMany(15, function () use ($event) {
+            $dateTimeStart = new DateTime();
+            $dateTimeStart->setTimestamp($shiftStart);
+            $dateTimeEnd = new DateTime();
+            $dateTimeEnd->setTimestamp($shiftEnd);
+
             return [
                 'event' => $event,
-                'zone' => ZoneFactory::random(),
-                'user' => UserTMFactory::random()
-            ];
-        });
-
-        QuestFactory::createMany(30, function () use ($event) {
-            return [
-                'event' => $event,
-                'zone' => ZoneFactory::random()
+                'shiftStart' => $dateTimeStart,
+                'shiftEnd' => $dateTimeEnd,
+                'zone' => ZoneFactory::random(['event' => $event]),
+                'user' => $volunteers[rand(0, (count($volunteers) - 1))]
             ];
         });
 
         StartedQuestFactory::createMany(50, function () {
+            $event = EventFactory::random();
             return [
-                'quest' => QuestFactory::random(),
+                'quest' => QuestFactory::random(['event' => $event]),
                 'user' => UserTMFactory::random(),
-                'userGuild' => GuildFactory::random()
+                'userGuild' => GuildFactory::random(['event' => $event])
             ];
         });
 
@@ -134,25 +162,29 @@ class AppFixtures extends Fixture
 
         TriggerWarningFactory::createMany(20);
 
-        RpgFactory::createMany(10, function () {
+        RpgFactory::createMany(20, function () {
             return [
                 'tags' => TagFactory::randomRange(0, 5),
                 'triggerWarnings' => TriggerWarningFactory::randomRange(0, 5)
             ];
         });
 
-        $rpgZone = RpgZoneFactory::createOne([
-            'event' => $event,
-            'zone' => ZoneFactory::random()
-        ]);
+        foreach ($events as $event) {
+            if (count($event->getZones()) > 0) {
+                $rpgZone = RpgZoneFactory::createOne([
+                    'event' => $event,
+                    'zone' => ZoneFactory::random(['event' => $event])
+                ]);
 
-        RpgActivityFactory::createMany(5, function () use ($rpgZone) {
-            return [
-                'rpgZone' => $rpgZone
-            ];
-        });
+                RpgActivityFactory::createMany(5, function () use ($rpgZone) {
+                    return [
+                        'rpgZone' => $rpgZone
+                    ];
+                });
+            }
+        }
 
-        RpgTableFactory::createMany(5, function () {
+        RpgTableFactory::createMany(8, function () {
             return [
                 'rpgActivity' => RpgActivityFactory::random(),
                 'userGm' => UserTMFactory::random()
@@ -180,7 +212,7 @@ class AppFixtures extends Fixture
 
         EntertainmentTypeFactory::createMany(5);
 
-        EntertainmentFactory::createMany(10, function () {
+        EntertainmentFactory::createMany(20, function () {
             return [
                 'entertainmentType' => EntertainmentTypeFactory::random(),
                 'zone' => ZoneFactory::random()
@@ -211,7 +243,6 @@ class AppFixtures extends Fixture
                 ];
             }
         });
-
 
         $manager->flush();
     }

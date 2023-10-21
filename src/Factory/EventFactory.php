@@ -47,7 +47,7 @@ final class EventFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'name' => self::faker()->words(2, true),
+            'name' => 'Evénement '. self::faker()->unique()->word(),
             //'organization' => OrganizationFactory::new(),
             'presentation' => self::faker()->paragraph(),
         ];

@@ -48,7 +48,7 @@ final class ZoneFactory extends ModelFactory
     {
         return [
             //'event' => EventFactory::new(),
-            'name' => self::faker()->words(3, true),
+            'name' => 'Zone '. self::faker()->words(2, true),
         ];
     }
 

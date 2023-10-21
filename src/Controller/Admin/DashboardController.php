@@ -14,7 +14,9 @@ use App\Entity\UserTM;
 use App\Entity\VolunteerShift;
 use App\Entity\Zone;
 use App\Repository\EventRepository;
+use App\Repository\OrganizationRepository;
 use App\Repository\UserTMRepository;
+use DateTime;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -22,6 +24,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -29,22 +33,85 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private UserTMRepository $userTMRepository,
-        private EventRepository $eventRepository
+        private EventRepository $eventRepository,
+        private OrganizationRepository $organizationRepository,
+        private RequestStack $requestStack
     ) {
     }
+
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
-        // TODO permettre de sélectionner une organisation ou un événement pour filtrer les stats et données
+        // sélection d'une organisation ou d'un événement pour filtrer les stats et données
+        $chosenFilter = null;
+        $currentRequest = $this->requestStack->getCurrentRequest();
+        if ($currentRequest->query->get('filter-datas') && $currentRequest->query->get('filter-value')) {
+            $repo = null;
+            switch ($currentRequest->query->get('filter-datas')) {
+                case 'organization':
+                    $repo = $this->organizationRepository;
+                    break;
+                case 'event':
+                    $repo = $this->eventRepository;
+                    break;
+            }
+            $chosenFilter = $repo->findOneBy(['id' => intval($currentRequest->query->get('filter-value'))]);
+            $currentRequest->getSession()->set('filterByElement', $chosenFilter);
+        }
 
+
+
+        // statistiques
         $users = $this->userTMRepository->count([]);
-        $nextEvent = $this->eventRepository->findNextEvent()[0];
+        $events = $this->eventRepository->findAll();
+        $currentEvent = null;
+        $next_event = null;
+        $next_event_open_day = null;
+        foreach ($events as $event) {
+            foreach ($event->getOpenDays() as $openDay) {
+                if ($openDay->getDayStart() <= new DateTime() && $openDay->getDayEnd() >= new DateTime()) {
+                    $currentEvent = $event;
+                } elseif ($openDay->getDayStart() > new DateTime()) {
+                    if ($next_event_open_day == null || $next_event_open_day > $openDay->getDayStart()) {
+                        $next_event_open_day = $openDay->getDayStart();
+                        $next_event = $event;
+                    }
+                }
+            }
+        }
 
 
         return $this->render('/bundles/easyadmin/dashboard.html.twig', [
             'users_count' => $users,
-            'next_event' => $nextEvent
+            'next_event' => $next_event,
+            'current_event' => $currentEvent,
+            'chosen_filter' => $currentRequest->getSession()->get('filterByElement')
         ]);
+    }
+
+    #[Route('/admin/get-list/{type}', name: 'admin-dashboard-get-list')]
+    public function dashboard_get_list($type)
+    {
+        $elements = null;
+        switch ($type) {
+            case "organization":
+                $elements = $this->organizationRepository->findAll();
+                break;
+            case "event":
+                $elements = $this->eventRepository->findAll();
+                break;
+        }
+
+        return $this->render("bundles/easyadmin/dashboard_includes/select_filter.html.twig", [
+            'list' => $elements
+        ]);
+    }
+
+    #[Route('/admin/reset-filter', name: 'admin_dashboard_reset_filter')]
+    public function dashboard_reset_filter()
+    {
+        $this->requestStack->getSession()->remove('filterByElement');
+        return $this->redirectToRoute('admin');
     }
 
     public function configureDashboard(): Dashboard
@@ -56,7 +123,11 @@ class DashboardController extends AbstractDashboardController
 
     public function configureAssets(): Assets
     {
-        return Assets::new()->addHtmlContentToHead('<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>');
+        $assets = parent::configureAssets();
+
+        $assets->addWebpackEncoreEntry('admin');
+
+        return $assets;
     }
 
     public function configureActions(): Actions

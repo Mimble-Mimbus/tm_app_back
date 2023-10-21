@@ -46,9 +46,27 @@ final class PaymentableFactory extends ModelFactory
      */
     protected function getDefaults(): array
     {
+        $names = [
+            'canette coca',
+            'canette oasis',
+            'bouteille bière',
+            'bière pression',
+            'crèpe',
+            'gaufre',
+            'sandwich',
+            'hotdog',
+            'ticket entrée',
+            'ticket soirée',
+            'goodies badges',
+            'goodies stickers',
+            'ecocup',
+            'goodies t-shirt',
+            'pass 3 jours'
+        ];
+
         return [
             //'event' => EventFactory::new(),
-            'name' => self::faker()->word(),
+            'name' => self::faker()->randomElement($names),
             //'typePaymentable' => TypePaymentableFactory::new(),
         ];
     }

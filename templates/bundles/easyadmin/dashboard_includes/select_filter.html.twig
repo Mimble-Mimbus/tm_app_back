@@ -1,0 +1,5 @@
+<select class="form-select bg-dark" name="filter-value" required>
+	{% for item in list %}
+		<option value="{{ item.id }}">{{ item.name }}</option>
+	{% endfor %}
+</select>
