@@ -70,6 +70,11 @@ abstract class AActivityReservation
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->name;
+    }
     
     abstract public function getUser();
 

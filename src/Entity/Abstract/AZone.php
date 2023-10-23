@@ -23,7 +23,13 @@ abstract class AZone
 
         return $this;
     }
-
+    
+    public function __toString()
+    {
+        return $this->name;
+    }
+    
     abstract public function getEvent(): ?Event;
     abstract public function setEvent(?Event $event):static;
+
 }

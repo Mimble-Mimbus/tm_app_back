@@ -16,17 +16,22 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityRepository;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class EventCrudController extends AbstractCrudController
 {
     public function __construct(
         private OrganizationRepository $organizationRepository,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private AdminUrlGenerator $adminUrlGenerator
     ) {
     }
 
@@ -77,33 +82,108 @@ class EventCrudController extends AbstractCrudController
             $organization_selected = $this->organizationRepository->find($organization_param);
             $org_field = AssociationField::new('organization', 'Organisation')->setEmptyData($organization_selected)->setDisabled();
         }
-        $fields = [
-            $org_field,
-            TextField::new('name', 'Nom'),
-            TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
-            CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class),
-            CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)
-        ];
+
+        $fields = [];
+        switch ($pageName) {
+            case 'new':
+            case 'edit':
+            case 'detail':
+                $fields = [
+                    FormField::addTab('Informations générales'),
+                    $org_field,
+                    TextField::new('name', 'Nom'),
+                    TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
+                    CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class),
+                    CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)->setHelp("Date et horaires de chaque jour d'ouverture"),
+
+                    FormField::addTab('Zones'),
+                    CollectionField::new('zones')->useEntryCrudForm(ZoneCrudController::class),
+
+                    FormField::addTab('Guildes'),
+                    CollectionField::new('guilds', 'Guildes')->useEntryCrudForm(GuildCrudController::class),
+
+                    FormField::addTab('Facturables'),
+                    CollectionField::new('paymentables', 'Facturables')->useEntryCrudForm(PaymentableCrudController::class)
+                ];
+                break;
+            case 'index':
+                $fields = [
+                    TextField::new('name', 'Nom'),
+                    TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
+                    $org_field,
+                    CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class),
+                    CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)
+                ];
+        }
 
         return $fields;
     }
 
     public function configureActions(Actions $actions): Actions
     {
+        $manageRpgZones = Action::new('manageRpgZones', 'Gérer les zones RPG')
+            ->linkToUrl(function (Event $event) {
+                return $this->adminUrlGenerator
+                    ->setController(RpgZoneCrudController::class)
+                    ->setAction('index')
+                    ->set('event', $event->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            });
+
+        $managePaymentables = Action::new('managePaymentables', 'Gérer les facturables')
+            ->linkToUrl(function (Event $event) {
+                return $this->adminUrlGenerator
+                    ->setController(PaymentableCrudController::class)
+                    ->setAction('index')
+                    ->set('event', $event->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            });
+
+        $manageGuilds = Action::new('manageGuilds', 'Gérer les guildes')
+            ->linkToUrl(function (Event $event) {
+                return $this->adminUrlGenerator
+                    ->setController(GuildCrudController::class)
+                    ->setAction('index')
+                    ->set('event', $event->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            });
+
+        $manageQuests = Action::new('manageQuests', 'Gérer les quêtes')
+            ->linkToUrl(function (Event $event) {
+                return $this->adminUrlGenerator
+                    ->setController(QuestCrudController::class)
+                    ->setAction('index')
+                    ->set('event', $event->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            });
+
+
         return $actions
+            ->add(Crud::PAGE_INDEX, $managePaymentables)
+            ->add(Crud::PAGE_INDEX, $manageRpgZones)
+            ->add(Crud::PAGE_INDEX, $manageGuilds)
+            ->add(Crud::PAGE_INDEX, $manageQuests)
+            ->add(Crud::PAGE_DETAIL, $managePaymentables)
+            ->add(Crud::PAGE_DETAIL, $manageRpgZones)
+            ->add(Crud::PAGE_DETAIL, $manageGuilds)
+            ->add(Crud::PAGE_DETAIL, $manageQuests)
             ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
                 return $action
-                    ->setLabel('Créer un évènement');
+                    ->setLabel('Créer un événement');
             });
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setEntityLabelInPlural('évènements')
-            ->setEntityLabelInSingular('évènement')
-            ->setPageTitle(Crud::PAGE_INDEX, 'Evènements')
-            ->setPageTitle(Crud::PAGE_NEW, 'Créer un évènement')
-            ->setPageTitle(Crud::PAGE_EDIT, 'Modifier un évènement');
+            ->setEntityLabelInPlural('événements')
+            ->setEntityLabelInSingular('événement')
+            ->setPageTitle(Crud::PAGE_INDEX, 'Evénements')
+            ->setPageTitle(Crud::PAGE_NEW, 'Créer un événement')
+            ->setPageTitle(Crud::PAGE_EDIT, 'Modifier un événement');
     }
 }

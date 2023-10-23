@@ -24,7 +24,7 @@ class Event extends AStructure
     #[Groups('main')]
     private Collection $openDays;
 
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Zone::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Zone::class, orphanRemoval: true, cascade: ['persist'])]
     #[Groups('main')]
     private Collection $zones;
 
@@ -32,7 +32,7 @@ class Event extends AStructure
     #[ORM\JoinColumn(nullable: false)]
     private ?Organization $organization = null;
 
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Paymentable::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Paymentable::class, orphanRemoval: true, cascade: ['persist'])]
     #[Groups('main')]
     private Collection $paymentables;
 
@@ -48,7 +48,7 @@ class Event extends AStructure
     #[Groups('main')]
     private Collection $urls;
 
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Guild::class)]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Guild::class, cascade: ['persist'])]
     #[Groups('main')]
     private Collection $guilds;
 
@@ -56,11 +56,7 @@ class Event extends AStructure
     #[Groups('main')]
     private Collection $quests;
 
-    #[ORM\OneToOne(mappedBy: 'event', cascade: ['persist', 'remove'])]
-    #[Groups('main')]
-    private ?RpgZone $rpgZone = null;
-
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: RpgZone::class)]
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: RpgZone::class, cascade: ['persist'])]
     #[Groups('main')]
     private Collection $rpgZones;
 
@@ -330,23 +326,6 @@ class Event extends AStructure
                 $quest->setEvent(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getRpgZone(): ?RpgZone
-    {
-        return $this->rpgZone;
-    }
-
-    public function setRpgZone(RpgZone $rpgZone): static
-    {
-        // set the owning side of the relation if necessary
-        if ($rpgZone->getEvent() !== $this) {
-            $rpgZone->setEvent($this);
-        }
-
-        $this->rpgZone = $rpgZone;
 
         return $this;
     }

@@ -21,13 +21,13 @@ class RpgZone extends AZone
     private ?int $availableTables = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $MinStartHour = null;
+    private ?string $minStartHour = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $MaxEndHour = null;
+    private ?string $maxEndHour = null;
 
     #[ORM\Column]
-    private ?int $MaxAvailableSeatsPerTable = null;
+    private ?int $maxAvailableSeatsPerTable = null;
 
     #[ORM\OneToMany(mappedBy: 'rpgZone', targetEntity: RpgActivity::class)]
     private Collection $rpgActivities;
@@ -64,36 +64,36 @@ class RpgZone extends AZone
 
     public function getMinStartHour(): ?string
     {
-        return $this->MinStartHour;
+        return $this->minStartHour;
     }
 
-    public function setMinStartHour(string $MinStartHour): static
+    public function setMinStartHour(string $minStartHour): static
     {
-        $this->MinStartHour = $MinStartHour;
+        $this->minStartHour = $minStartHour;
 
         return $this;
     }
 
     public function getMaxEndHour(): ?string
     {
-        return $this->MaxEndHour;
+        return $this->maxEndHour;
     }
 
-    public function setMaxEndHour(string $MaxEndHour): static
+    public function setMaxEndHour(string $maxEndHour): static
     {
-        $this->MaxEndHour = $MaxEndHour;
+        $this->maxEndHour = $maxEndHour;
 
         return $this;
     }
 
     public function getMaxAvailableSeatsPerTable(): ?int
     {
-        return $this->MaxAvailableSeatsPerTable;
+        return $this->maxAvailableSeatsPerTable;
     }
 
-    public function setMaxAvailableSeatsPerTable(int $MaxAvailableSeatsPerTable): static
+    public function setMaxAvailableSeatsPerTable(int $maxAvailableSeatsPerTable): static
     {
-        $this->MaxAvailableSeatsPerTable = $MaxAvailableSeatsPerTable;
+        $this->maxAvailableSeatsPerTable = $maxAvailableSeatsPerTable;
 
         return $this;
     }
@@ -150,5 +150,10 @@ class RpgZone extends AZone
         $this->zone = $zone;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->name;
     }
 }

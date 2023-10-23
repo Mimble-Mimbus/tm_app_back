@@ -38,6 +38,11 @@ abstract class AStructure
         $this->presentation = $presentation;
     }
 
+    public function __toString()
+    {
+        return $this->name;
+    }
+
     abstract public function getUrls(): Collection;
 
     abstract public function addUrl(Url $url): static;
