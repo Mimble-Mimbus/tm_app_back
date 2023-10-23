@@ -47,7 +47,7 @@ final class TypePaymentableFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'name' => self::faker()->word(),
+            'name' => self::faker()->randomElement(['billet entrée', 'consommable buvette', 'goodies', 'animation']),
         ];
     }
 

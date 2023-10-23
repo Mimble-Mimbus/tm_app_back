@@ -47,9 +47,9 @@ final class RpgZoneFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'MaxAvailableSeatsPerTable' => 5,
-            'MaxEndHour' => '18h',
-            'MinStartHour' => '9h',
+            'maxAvailableSeatsPerTable' => 5,
+            'maxEndHour' => '18h',
+            'minStartHour' => '9h',
             'availableTables' => 4,
             //'event' => EventFactory::new(),
             'name' => "Zone de JDR",

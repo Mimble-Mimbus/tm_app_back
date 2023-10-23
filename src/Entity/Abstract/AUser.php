@@ -194,4 +194,9 @@ abstract class AUser implements UserInterface, PasswordAuthenticatedUserInterfac
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->name;
+    }
 }

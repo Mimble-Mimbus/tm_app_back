@@ -101,6 +101,11 @@ abstract class AActivity
         return $this;
     }
 
+    public function __toString()
+    {
+        return $this->name;
+    }
+
     abstract public function getActivitieSchedules(): Collection;
 
     abstract public function addActivitySchedule($activitySchedule): static;

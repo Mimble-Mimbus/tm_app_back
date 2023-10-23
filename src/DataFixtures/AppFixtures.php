@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Controller\Admin\GuildCrudController;
 use App\Factory\EntertainmentFactory;
 use App\Factory\EntertainmentReservationFactory;
 use App\Factory\EntertainmentScheduleFactory;
@@ -56,7 +57,13 @@ class AppFixtures extends Fixture
             ];
         });
 
-        TypePaymentableFactory::createMany(5);
+        $typesPaymentable = ['billet entrée', 'consommable buvette', 'goodies', 'animation'];
+
+        foreach ($typesPaymentable as $type) {
+            TypePaymentableFactory::createOne([
+                'name' => $type
+            ]);
+        }
 
         PaymentableFactory::createMany(20, function () {
             return [
@@ -97,9 +104,12 @@ class AppFixtures extends Fixture
             });
 
             QuestFactory::createMany(rand(5, 15), function () use ($event) {
+                $isSecret = rand(0, 1);
                 return [
                     'event' => $event,
-                    'zone' => ZoneFactory::random(['event' => $event])
+                    'zone' => ZoneFactory::random(['event' => $event]),
+                    'isSecret' => $isSecret == 1 ? true : false,
+                    'guild' => $isSecret == 1 ? GuildFactory::random(['event' => $event]) : null
                 ];
             });
         }

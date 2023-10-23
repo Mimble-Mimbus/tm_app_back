@@ -20,7 +20,7 @@ class Paymentable
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'paymentable', targetEntity: Price::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'paymentable', targetEntity: Price::class, orphanRemoval:true, cascade: ['persist'])]
     private Collection $prices;
 
     #[ORM\ManyToOne(inversedBy: 'paymentable')]
