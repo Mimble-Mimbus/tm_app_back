@@ -108,7 +108,7 @@ class EventCrudController extends AbstractCrudController
                 break;
             case 'index':
                 $fields = [
-                    TextField::new('name', 'Nom'),
+                    TextField::new('name', 'Nom')->setTemplatePath('bundles/easyadmin/fields/text_linktodetail.html.twig'),
                     TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
                     $org_field,
                     CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class),
