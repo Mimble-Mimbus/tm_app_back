@@ -65,7 +65,7 @@ class OrganizationCrudController extends AbstractCrudController
             TextField::new('name', 'Nom')->setTemplatePath('bundles/easyadmin/fields/text_linktodetail.html.twig'),
             TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
             EmailField::new('email'),
-            CollectionField::new('urls')->useEntryCrudForm(UrlCrudController::class),
+            CollectionField::new('urls')->useEntryCrudForm(UrlCrudController::class)->setTemplatePath('bundles/easyadmin/fields/collection_urllist.html.twig'),
             CollectionField::new('events')->onlyOnDetail()
         ];
     }

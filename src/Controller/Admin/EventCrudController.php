@@ -93,7 +93,7 @@ class EventCrudController extends AbstractCrudController
                     $org_field,
                     TextField::new('name', 'Nom'),
                     TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
-                    CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class),
+                    CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class)->setTemplatePath('bundles/easyadmin/fields/collection_urllist.html.twig'),
                     CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)->setHelp("Date et horaires de chaque jour d'ouverture"),
 
                     FormField::addTab('Zones'),
@@ -111,7 +111,7 @@ class EventCrudController extends AbstractCrudController
                     TextField::new('name', 'Nom')->setTemplatePath('bundles/easyadmin/fields/text_linktodetail.html.twig'),
                     TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
                     $org_field,
-                    CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class),
+                    CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class)->setTemplatePath('bundles/easyadmin/fields/collection_urllist.html.twig'),
                     CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)
                 ];
         }
@@ -121,7 +121,17 @@ class EventCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $manageRpgZones = Action::new('manageRpgZones', 'Gérer les zones RPG')
+        $manageZones = Action::new('manageZones', 'Gérer les zones')
+            ->linkToUrl(function (Event $event) {
+                return $this->adminUrlGenerator
+                    ->setController(ZoneCrudController::class)
+                    ->setAction('index')
+                    ->set('event', $event->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            });
+
+        $manageRpgZones = Action::new('manageRpgZones', 'Gérer les zones de JDR')
             ->linkToUrl(function (Event $event) {
                 return $this->adminUrlGenerator
                     ->setController(RpgZoneCrudController::class)
@@ -165,16 +175,21 @@ class EventCrudController extends AbstractCrudController
         return $actions
             ->add(Crud::PAGE_INDEX, $managePaymentables)
             ->add(Crud::PAGE_INDEX, $manageRpgZones)
+            ->add(Crud::PAGE_INDEX, $manageZones)
             ->add(Crud::PAGE_INDEX, $manageGuilds)
             ->add(Crud::PAGE_INDEX, $manageQuests)
             ->add(Crud::PAGE_DETAIL, $managePaymentables)
             ->add(Crud::PAGE_DETAIL, $manageRpgZones)
+            ->add(Crud::PAGE_DETAIL, $manageZones)
             ->add(Crud::PAGE_DETAIL, $manageGuilds)
             ->add(Crud::PAGE_DETAIL, $manageQuests)
             ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
                 return $action
                     ->setLabel('Créer un événement');
-            });
+            })
+            ->reorder(Crud::PAGE_DETAIL, ['manageZones', 'manageRpgZones', 'managePaymentables', 'manageGuilds', 'manageQuests', 'edit', 'delete', 'index'])
+            ->reorder(Crud::PAGE_INDEX, ['manageZones', 'manageRpgZones', 'managePaymentables', 'manageGuilds', 'manageQuests', 'detail', 'edit', 'delete'])
+            ;
     }
 
     public function configureCrud(Crud $crud): Crud
