@@ -62,10 +62,10 @@ class OrganizationCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->onlyOnIndex(),
-            TextField::new('name', 'Nom'),
+            TextField::new('name', 'Nom')->setTemplatePath('bundles/easyadmin/fields/text_linktodetail.html.twig'),
             TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
             EmailField::new('email'),
-            CollectionField::new('urls')->useEntryCrudForm(UrlCrudController::class),
+            CollectionField::new('urls')->useEntryCrudForm(UrlCrudController::class)->setTemplatePath('bundles/easyadmin/fields/collection_urllist.html.twig'),
             CollectionField::new('events')->onlyOnDetail()
         ];
     }
@@ -93,11 +93,13 @@ class OrganizationCrudController extends AbstractCrudController
 
         return $actions
             ->add(Crud::PAGE_INDEX, $newEvent)
+            ->add(Crud::PAGE_DETAIL, $newEvent)
             ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
                 return $action->setLabel('Créer une organisation');
             })
+            ->reorder(Crud::PAGE_DETAIL, ['newEvent', 'edit', 'delete', 'index'])
             ->reorder(Crud::PAGE_INDEX, ['edit', 'detail', 'newEvent', 'delete']);
-    }
+        }
 
    
 }

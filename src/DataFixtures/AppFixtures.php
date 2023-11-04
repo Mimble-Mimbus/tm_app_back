@@ -66,9 +66,41 @@ class AppFixtures extends Fixture
         }
 
         PaymentableFactory::createMany(20, function () {
+            $array = ['billet entrée' => [
+                'ticket entrée',
+                'ticket soirée',
+                'ticket earlybird',
+                'pass 3 jours'
+            ], 
+            'consommable buvette' => [
+                'canette coca',
+                'canette oasis',
+                'bouteille bière',
+                'bière pression',
+                'crèpe',
+                'gaufre',
+                'sandwich',
+                'hotdog',
+            ], 
+            'goodies' => [
+                'badges',
+                'stickers',
+                'ecocup',
+                't-shirt',
+
+            ], 
+            'animation' => [
+                'ticket individuel',
+                'ticket famille',
+                'ticket earlybird'
+            ]];
+            $types = ['billet entrée', 'consommable buvette', 'goodies', 'animation'];
+            $type = $types[rand(0, count($types) - 1)];
+
             return [
+                'name' => $array[$type][rand(0, count($array[$type]) -1)],
                 'event' => EventFactory::random(),
-                'typePaymentable' => TypePaymentableFactory::random()
+                'typePaymentable' => TypePaymentableFactory::random(['name' => $type])
             ];
         });
 
@@ -81,8 +113,8 @@ class AppFixtures extends Fixture
         foreach ($events as $event) {
             $year = rand(2023, 2026);
             $month = rand(01, 12);
-            $starts = [$year . '-' . $month . '-01 8:00', $year . '-' . $month . '-01 8:00', $year . '-' . $month . '-01 8:00'];
-            $ends = [$year . '-' . $month . '-01 20:00', $year . '-' . $month . '-01 20:00', $year . '-' . $month . '-01 20:00'];
+            $starts = [$year . '-' . $month . '-01 8:00', $year . '-' . $month . '-02 8:00', $year . '-' . $month . '-03 8:00'];
+            $ends = [$year . '-' . $month . '-01 20:00', $year . '-' . $month . '-02 20:00', $year . '-' . $month . '-03 20:00'];
             foreach ($starts as $i => $v) {
                 OpenDayFactory::createOne([
                     'dayStart' => new DateTime($v),
