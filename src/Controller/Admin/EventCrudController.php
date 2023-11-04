@@ -64,9 +64,13 @@ class EventCrudController extends AbstractCrudController
     {
         $event = new Event;
         $organization_param = $this->requestStack->getMainRequest()->query->get('organization');
+        $organization_selected = null;
 
         if ($organization_param && $organization_param != "") {
             $organization_selected = $this->organizationRepository->find($organization_param);
+            $event->setOrganization($organization_selected);
+        } elseif ($this->requestStack->getSession()->get('filterByElement') && $this->requestStack->getSession()->get('filterByElement') instanceof Organization) {
+            $organization_selected = $this->organizationRepository->find($this->requestStack->getSession()->get('filterByElement'));
             $event->setOrganization($organization_selected);
         }
 
@@ -78,8 +82,15 @@ class EventCrudController extends AbstractCrudController
         $organization_param = $this->requestStack->getMainRequest()->query->get('organization');
         $org_field = AssociationField::new('organization', 'Organisation');
 
+        $organization_selected = null;
+
         if ($organization_param && $organization_param != "") {
             $organization_selected = $this->organizationRepository->find($organization_param);
+        } elseif ($this->requestStack->getSession()->get('filterByElement') && $this->requestStack->getSession()->get('filterByElement') instanceof Organization) {
+            $organization_selected = $this->organizationRepository->find($this->requestStack->getSession()->get('filterByElement'));
+        }
+
+        if ($organization_selected) {
             $org_field = AssociationField::new('organization', 'Organisation')->setEmptyData($organization_selected)->setDisabled();
         }
 
