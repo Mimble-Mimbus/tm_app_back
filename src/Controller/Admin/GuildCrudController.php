@@ -42,7 +42,8 @@ class GuildCrudController extends AbstractCrudController
             $element = $this->requestStack->getSession()->get('filterByElement');
             if ($element instanceof Organization) {
                 $response = $response
-                    ->where("entity.event.organization = :org")
+                    ->join(Event::class, 'e', 'WITH', 'entity.event = e')
+                    ->where("e.organization = :org")
                     ->setParameter('org', $element);
             } elseif ($element instanceof Event) {
                 $response = $response
