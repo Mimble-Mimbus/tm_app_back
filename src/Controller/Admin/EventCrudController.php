@@ -94,7 +94,7 @@ class EventCrudController extends AbstractCrudController
                     TextField::new('name', 'Nom'),
                     TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
                     CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class)->setTemplatePath('bundles/easyadmin/fields/collection_urllist.html.twig'),
-                    CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)->setHelp("Date et horaires de chaque jour d'ouverture"),
+                    CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)->setHelp("Date et horaires de chaque jour d'ouverture")->setTemplatePath('bundles/easyadmin/fields/collection_opendaylist.html.twig'),
 
                     FormField::addTab('Zones'),
                     CollectionField::new('zones')->useEntryCrudForm(ZoneCrudController::class),
@@ -112,7 +112,7 @@ class EventCrudController extends AbstractCrudController
                     TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
                     $org_field,
                     CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class)->setTemplatePath('bundles/easyadmin/fields/collection_urllist.html.twig'),
-                    CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)
+                    CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)->setTemplatePath('bundles/easyadmin/fields/collection_opendaylist.html.twig')
                 ];
         }
 
