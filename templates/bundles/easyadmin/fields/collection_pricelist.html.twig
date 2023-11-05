@@ -1,0 +1,25 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+
+{% if ea.crud.currentAction == 'detail' %}
+    {% if field.value|length == 1 %}
+       {% for item in field.value %}
+            <span>{{  item.priceCondition }} : {{ item }}</span>
+       {% endfor %} 
+    {% else %}     
+        <ul>
+            {% for item in field.value %}
+                <li>
+                    {{  item.priceCondition }} : {{ item }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% else %}
+	{% for item in field.value %}
+		<span class="badge badge-secondary">
+            {{  item.priceCondition }} : {{ item }}
+		</span>
+	{% endfor %}
+{% endif %}
