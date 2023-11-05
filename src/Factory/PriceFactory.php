@@ -48,7 +48,7 @@ final class PriceFactory extends ModelFactory
     {
         return [
             //'paymentable' => PaymentableFactory::new(),
-            'price' => self::faker()->randomNumber(),
+            'price' => self::faker()->numberBetween(100, 10000),
             'priceCondition' => self::faker()->randomElement(['tarif réduit', 'plein tarif', 'réduction sur présentation de coupon', 'lot de 3', 'early bird']),
         ];
     }
