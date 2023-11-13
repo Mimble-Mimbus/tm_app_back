@@ -138,4 +138,11 @@ class RpgZoneCrudController extends AbstractCrudController
         $entityInstance->setEvent($entityInstance->getZone()->getEvent());
         parent::updateEntity($entityManager, $entityInstance);
     }
+
+    public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $zone = $entityInstance->getZone();
+        $zone->setRpgZone(null);
+        parent::deleteEntity($entityManager, $entityInstance);
+    }
 }

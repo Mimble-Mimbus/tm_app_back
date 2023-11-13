@@ -19,7 +19,7 @@ class RpgActivity extends AActivity
     #[ORM\ManyToOne(inversedBy: 'rpgActivities')]
     private ?RpgZone $rpgZone = null;
 
-    #[ORM\OneToMany(mappedBy: 'rpgActivity', targetEntity: RpgTable::class)]
+    #[ORM\OneToMany(mappedBy: 'rpgActivity', targetEntity: RpgTable::class, cascade: ['remove'])]
     private Collection $rpgTables;
 
     public function __construct()

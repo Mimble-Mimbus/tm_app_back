@@ -24,7 +24,7 @@ class RpgTable extends AActivitySchedule
     #[ORM\JoinColumn(nullable: false)]
     private ?UserTM $userGm = null;
 
-    #[ORM\OneToMany(mappedBy: 'rpgTable', targetEntity: RpgReservation::class)]
+    #[ORM\OneToMany(mappedBy: 'rpgTable', targetEntity: RpgReservation::class, cascade: ['remove'])]
     private Collection $rpgReservations;
 
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'rpgTables')]

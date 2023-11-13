@@ -29,14 +29,14 @@ class RpgZone extends AZone
     #[ORM\Column]
     private ?int $maxAvailableSeatsPerTable = null;
 
-    #[ORM\OneToMany(mappedBy: 'rpgZone', targetEntity: RpgActivity::class)]
+    #[ORM\OneToMany(mappedBy: 'rpgZone', targetEntity: RpgActivity::class, cascade: ['remove'])]
     private Collection $rpgActivities;
 
     #[ORM\ManyToOne(inversedBy: 'rpgZones')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Event $event = null;
 
-    #[ORM\OneToOne(inversedBy: 'rpgZone', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'rpgZone', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Zone $zone = null;
 
