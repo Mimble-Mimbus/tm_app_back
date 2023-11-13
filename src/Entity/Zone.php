@@ -120,10 +120,10 @@ class Zone extends AZone
         return $this->rpgZone;
     }
 
-    public function setRpgZone(RpgZone $rpgZone): static
+    public function setRpgZone(?RpgZone $rpgZone): static
     {
         // set the owning side of the relation if necessary
-        if ($rpgZone->getZone() !== $this) {
+        if ($rpgZone !== null && $rpgZone->getZone() !== $this) {
             $rpgZone->setZone($this);
         }
 
