@@ -24,11 +24,31 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class PaymentableCrudController extends AbstractCrudController
 {
+
+    private $filterEvent = null;
+    private  $filterOrganization = null;
+
     public function __construct(
         private RequestStack $requestStack,
         private EventRepository $eventRepository,
         private AdminUrlGenerator $adminUrlGenerator
     ) {
+        if ($this->requestStack->getSession()->get('filterByElement')) {
+            $element = $this->requestStack->getSession()->get('filterByElement');
+            if ($element instanceof Organization) {
+                $this->filterOrganization = $element;
+            } elseif ($element instanceof Event) {
+                $this->filterEvent = $element;
+            }
+        }
+
+        if ($this->requestStack->getMainRequest()->query->get('event')) {
+            $this->filterEvent = $this->requestStack->getMainRequest()->query->get('event');
+        }
+
+        if ($this->filterEvent != null) {
+            $this->filterEvent = $this->eventRepository->find($this->filterEvent);
+        }
     }
 
     public static function getEntityFqcn(): string
@@ -40,26 +60,14 @@ class PaymentableCrudController extends AbstractCrudController
     {
         $response =  $this->container->get(EntityRepository::class)->createQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        if ($this->requestStack->getSession()->get('filterByElement')) {
-            $element = $this->requestStack->getSession()->get('filterByElement');
-            if ($element instanceof Organization) {
-                $response = $response
-                    ->join(Event::class, 'e', 'WITH', 'entity.event = e')
-                    ->where("e.organization = :org")
-                    ->setParameter('org', $element);
-            } elseif ($element instanceof Event) {
-                $response = $response
-                    ->where("entity.event = :event")
-                    ->setParameter('event', $element);
-            }
-        }
-
-        if ($this->requestStack->getMainRequest()->query->get('event')) {
-            $event = $this->requestStack->getMainRequest()->query->get('event');
-
+        if ($this->filterEvent != null) {
             $response = $response
-                ->where("entity.event = :event")
-                ->setParameter('event', $event);
+                ->where('entity.event = :event')
+                ->setParameter('event', $this->filterEvent);
+        } elseif ($this->filterOrganization != null) {
+            $response = $response->join(Event::class, 'e', 'WITH', 'entity.event = e')
+                ->where("e.organization = :org")
+                ->setParameter('org', $this->filterOrganization);
         }
 
         return $response;
@@ -68,10 +76,9 @@ class PaymentableCrudController extends AbstractCrudController
     public function createEntity(string $entityFqcn)
     {
         $entity = new Paymentable;
-        $event_param = $this->requestStack->getMainRequest()->query->get('event');
 
-        if ($event_param && $event_param != '') {
-            $entity->setEvent($this->eventRepository->find($event_param));
+        if ($this->filterEvent != null) {
+            $entity->setEvent($this->filterEvent);
         }
 
         return $entity;
@@ -81,18 +88,16 @@ class PaymentableCrudController extends AbstractCrudController
     {
         $eventField = AssociationField::new('event', 'Evènement');
 
-        if($this->requestStack->getMainRequest()->query->get('event')) {
+        if($this->filterEvent != null) {
 
-            $selectedEvent = $this->eventRepository->find($this->requestStack->getMainRequest()->query->get('event'));
-            $eventField = AssociationField::new('event', 'Evènement')->setEmptyData($selectedEvent)->setDisabled();
+            $eventField = AssociationField::new('event', 'Evènement')->setEmptyData($this->filterEvent)->setDisabled();
         
-        } elseif ($this->requestStack->getMainRequest()->getSession()->get('filterByElement') 
-        && $this->requestStack->getMainRequest()->getSession()->get('filterByElement') instanceof Organization) {
+        } elseif ($this->filterOrganization != null) {
 
             $eventField = AssociationField::new('event', 'Evènement')->setQueryBuilder(function ($queryBuilder) {
                 $queryBuilder
                 ->andWhere('entity.organization = :org')
-                ->setParameter('org', $this->requestStack->getMainRequest()->getSession()->get('filterByElement'));
+                ->setParameter('org', $this->filterOrganization);
             });
         }
 
@@ -121,19 +126,13 @@ class PaymentableCrudController extends AbstractCrudController
         return $actions
         ->update(Crud::PAGE_INDEX, Action::NEW, function(Action $action) {
             $action->setLabel('Créer un article facturable');
-            $selected_event = null;
 
-            if ($this->requestStack->getSession()->get('filterByElement') && $this->requestStack->getSession()->get('filterByElement') instanceof Event) {
-                $selected_event = $this->requestStack->getSession()->get('filterByElement')->getId();
-            } elseif ($this->requestStack->getMainRequest()->query->get('event')) {
-                $selected_event = $this->requestStack->getMainRequest()->query->get('event');
-            }
-            if ($selected_event) {
+            if ($this->filterEvent != null) {
                 return $action->linkToUrl(
                     $this->adminUrlGenerator
                     ->setController(PaymentableCrudController::class)
                     ->setAction('new')
-                    ->set('event', $selected_event)
+                    ->set('event', $this->filterEvent)
                     ->generateUrl()
                 );
             }
