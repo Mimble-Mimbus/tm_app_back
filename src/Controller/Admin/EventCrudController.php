@@ -108,10 +108,10 @@ class EventCrudController extends AbstractCrudController
                     CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)->setHelp("Date et horaires de chaque jour d'ouverture")->setTemplatePath('bundles/easyadmin/fields/collection_opendaylist.html.twig'),
 
                     FormField::addTab('Zones'),
-                    CollectionField::new('zones')->useEntryCrudForm(ZoneCrudController::class),
+                    CollectionField::new('zones')->useEntryCrudForm(NewEventZoneCrudController::class),
 
                     FormField::addTab('Guildes'),
-                    CollectionField::new('guilds', 'Guildes')->useEntryCrudForm(GuildCrudController::class),
+                    CollectionField::new('guilds', 'Guildes')->useEntryCrudForm(NewEventGuildCrudController::class),
 
                     FormField::addTab('Facturables'),
                     CollectionField::new('paymentables', 'Facturables')->useEntryCrudForm(PaymentableCrudController::class)

@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Event;
 use App\Entity\Organization;
 use App\Entity\RpgZone;
+use App\Entity\Zone;
 use App\Repository\EventRepository;
 use App\Repository\ZoneRepository;
 use DateTime;
@@ -28,13 +29,38 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RpgZoneCrudController extends AbstractCrudController
 {
+
+    private $filterEvent = null;
+    private $filterOrganization = null;
+
+    private $filterZone = null;
+
     public function __construct(
         private ZoneRepository $zoneRepository,
         private RequestStack $requestStack,
         private EventRepository $eventRepository,
         private AdminUrlGenerator $adminUrlGenerator
-    )
-    {        
+    ) {
+        if ($this->requestStack->getSession()->get('filterByElement')) {
+            $element = $this->requestStack->getSession()->get('filterByElement');
+            if ($element instanceof Organization) {
+                $this->filterOrganization = $element;
+            } elseif ($element instanceof Event) {
+                $this->filterEvent = $element;
+            }
+        }
+
+        if ($this->requestStack->getMainRequest()->query->get('event')) {
+            $this->filterEvent = $this->requestStack->getMainRequest()->query->get('event');
+        }
+
+        if ($this->filterEvent != null) {
+            $this->filterEvent = $this->eventRepository->find($this->filterEvent);
+        }
+
+        if ($this->requestStack->getMainRequest()->query->get('zone')) {
+            $this->filterZone = $this->zoneRepository->find($this->requestStack->getMainRequest()->query->get('zone'));
+        }
     }
 
     public static function getEntityFqcn(): string
@@ -46,40 +72,31 @@ class RpgZoneCrudController extends AbstractCrudController
     {
         $response =  $this->container->get(EntityRepository::class)->createQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        if ($this->requestStack->getSession()->get('filterByElement')) {
-            $element = $this->requestStack->getSession()->get('filterByElement');
-            if ($element instanceof Organization) {
-                $response = $response
-                    ->join(Event::class, 'e', 'WITH', 'entity.event = e')
-                    ->where("e.organization = :org")
-                    ->setParameter('org', $element);
-            } elseif ($element instanceof Event) {
-                $response = $response
-                    ->where("entity.event = :event")
-                    ->setParameter('event', $element);
-            }
-        }
-
-        if ($this->requestStack->getMainRequest()->query->get('event')) {
-            $event = $this->requestStack->getMainRequest()->query->get('event');
-
+        if ($this->filterZone != null) {
+            $response = $response->where('entity.zone = :zone')->setParameter(':zone', $this->filterZone);
+        } elseif ($this->filterEvent != null) {
             $response = $response
-                ->where("entity.event = :event")
-                ->setParameter('event', $event);
+                ->where('entity.event = :event')
+                ->setParameter('event', $this->filterEvent);
+        } 
+        if ($this->filterOrganization != null) {
+            $response = $response
+                ->join(Zone::class, 'z', 'WITH', 'entity.zone = z')
+                ->join(Event::class, 'e', 'WITH', 'z.event = e')
+                ->where("e.organization = :org")
+                ->setParameter('org', $this->filterOrganization);
         }
 
         return $response;
-        
     }
 
     public function createEntity(string $entityFqcn)
     {
         $entity = new RpgZone;
 
-        if ($this->requestStack->getMainRequest()->query->get('zone')) {
-            $zone = $this->zoneRepository->find($this->requestStack->getMainRequest()->query->get('zone'));
-            $entity->setZone($zone)
-            ->setEvent($zone->getEvent());
+        if ($this->filterZone != null) {
+            $entity->setZone($this->filterZone)
+                ->setEvent($this->filterZone->getEvent());
         }
 
         return $entity;
@@ -89,32 +106,28 @@ class RpgZoneCrudController extends AbstractCrudController
     {
         $zoneField = AssociationField::new('zone');
 
-        if($this->requestStack->getMainRequest()->query->get('zone')) {
+        if ($this->filterZone != null) {
 
-            $selectedZone = $this->zoneRepository->find($this->requestStack->getMainRequest()->query->get('zone'));
-            $zoneField = AssociationField::new('zone')->setEmptyData($selectedZone)->setDisabled();
-        
-        } elseif ($this->requestStack->getMainRequest()->getSession()->get('filterByElement')) {
+            $zoneField = AssociationField::new('zone')->setEmptyData($this->filterZone)->setDisabled();
+        } elseif ($this->filterOrganization != null) {
 
-            if ($this->requestStack->getMainRequest()->getSession()->get('filterByElement') instanceof Organization) {
 
-                $zoneField = AssociationField::new('zone')->setQueryBuilder(function ($queryBuilder) {
-                    $queryBuilder
+            $zoneField = AssociationField::new('zone')->setQueryBuilder(function ($queryBuilder) {
+                $queryBuilder
                     ->join(Event::class, 'e', 'WITH', 'entity.event = e')
                     ->andWhere('event.organization = :org')
-                    ->setParameter('org', $this->requestStack->getMainRequest()->getSession()->get('filterByElement'));
-                });
+                    ->setParameter('org', $this->filterOrganization);
+            });
+        } elseif ($this->filterEvent != null) {
 
-            } elseif ($this->requestStack->getMainRequest()->getSession()->get('filterByElement') instanceof Event) {
-
-                $zoneField = AssociationField::new('zone')->setQueryBuilder(function ($queryBuilder) {
-                    $queryBuilder
+            $zoneField = AssociationField::new('zone')->setQueryBuilder(function ($queryBuilder) {
+                $queryBuilder
                     ->andWhere('entity.event = :event')
-                    ->setParameter('event', $this->requestStack->getMainRequest()->getSession()->get('filterByElement'));
-                });
-            }
-
+                    ->setParameter('event', $this->filterEvent);
+            });
         }
+
+
 
         return [
             TextField::new('name', 'Nom')->setColumns('col-12')->setTemplatePath('bundles/easyadmin/fields/text_linktodetail.html.twig'),
