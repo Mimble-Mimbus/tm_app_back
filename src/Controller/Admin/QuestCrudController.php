@@ -5,7 +5,9 @@ namespace App\Controller\Admin;
 use App\Entity\Event;
 use App\Entity\Organization;
 use App\Entity\Quest;
+use App\Entity\Zone;
 use App\Repository\EventRepository;
+use App\Repository\ZoneRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use Doctrine\ORM\QueryBuilder;
@@ -26,11 +28,37 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class QuestCrudController extends AbstractCrudController
 {
+
+    private $filterEvent = null;
+    private $filterOrganization = null;
+    private $filterZone = null;
+
     public function __construct(
         private RequestStack $requestStack,
         private EventRepository $eventRepository,
-        private AdminUrlGenerator $adminUrlGenerator
+        private AdminUrlGenerator $adminUrlGenerator,
+        private ZoneRepository $zoneRepository
     ) {
+        if ($this->requestStack->getSession()->get('filterByElement')) {
+            $element = $this->requestStack->getSession()->get('filterByElement');
+            if ($element instanceof Organization) {
+                $this->filterOrganization = $element;
+            } elseif ($element instanceof Event) {
+                $this->filterEvent = $element;
+            }
+        }
+
+        if ($this->requestStack->getMainRequest()->query->get('event')) {
+            $this->filterEvent = $this->requestStack->getMainRequest()->query->get('event');
+        }
+
+        if ($this->filterEvent != null) {
+            $this->filterEvent = $this->eventRepository->find($this->filterEvent);
+        }
+
+        if ($this->requestStack->getMainRequest()->query->get('zone')) {
+            $this->filterZone = $this->zoneRepository->find($this->requestStack->getMainRequest()->query->get('zone'));
+        }
     }
     
     public static function getEntityFqcn(): string
@@ -42,28 +70,22 @@ class QuestCrudController extends AbstractCrudController
     {
         $response =  $this->container->get(EntityRepository::class)->createQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        if ($this->requestStack->getSession()->get('filterByElement')) {
-            $element = $this->requestStack->getSession()->get('filterByElement');
-            if ($element instanceof Organization) {
-                $response = $response
-                    ->join(Event::class, 'e', 'WITH', 'entity.event = e')
-                    ->where("e.organization = :org")
-                    ->setParameter('org', $element);
-            } elseif ($element instanceof Event) {
-                $response = $response
-                    ->where("entity.event = :event")
-                    ->setParameter('event', $element);
-            }
-        }
-
-        if ($this->requestStack->getMainRequest()->query->get('event')) {
-            $event = $this->requestStack->getMainRequest()->query->get('event');
-
+        if ($this->filterZone != null) {
             $response = $response
-                ->where("entity.event = :event")
-                ->setParameter('event', $event);
+                ->where("entity.zone = :zone")
+                ->setParameter('zone', $this->filterZone);
+        } elseif ($this->filterEvent != null) {
+            $response = $response
+                ->join(Zone::class, 'z', 'WITH', 'entity.zone = z')
+                ->where("z.event = :event")
+                ->setParameter('event', $this->filterEvent);
+        } elseif ($this->filterOrganization != null) {
+            $response = $response
+                ->join(Zone::class, 'z', 'WITH', 'entity.zone = z')
+                ->join(Event::class, 'e', 'WITH', 'z.event = e')
+                ->where("e.organization = :org")
+                ->setParameter('org', $this->filterOrganization);
         }
-
         return $response;
     }
 
@@ -71,8 +93,13 @@ class QuestCrudController extends AbstractCrudController
     {
         $entity = new Quest;
 
-        if ($this->requestStack->getMainRequest()->query->get('event')) {
-            $entity->setEvent($this->eventRepository->find($this->requestStack->getMainRequest()->query->get('event')));
+        if ($this->filterZone != null) {
+            $entity->setZone($this->filterZone);
+            $entity->setEvent($this->filterZone->getEvent());
+        }
+
+        if($this->filterEvent != null && $entity->getEvent() == null) {
+            $entity->setEvent($this->filterEvent);
         }
 
         return $entity;
@@ -81,25 +108,24 @@ class QuestCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         $eventField = AssociationField::new('event', 'Evènement');
+        $zoneField = AssociationField::new('zone');
 
-        if($this->requestStack->getMainRequest()->query->get('event')) {
+        if ($this->filterZone) {
 
-            $selectedEvent = $this->eventRepository->find($this->requestStack->getMainRequest()->query->get('event'));
-            $eventField = AssociationField::new('event', 'Evènement')->setEmptyData($selectedEvent)->setDisabled();
+            $zoneField = AssociationField::new('zone')->setEmptyData($this->filterZone)->setDisabled();
+            $eventField = AssociationField::new('event', 'Evènement')->setEmptyData($this->filterZone->getEvent())->setDisabled();
         
-        } elseif ($this->requestStack->getMainRequest()->getSession()->get('filterByElement')) {
+        } elseif ($this->filterEvent) {
 
-            if ($this->requestStack->getMainRequest()->getSession()->get('filterByElement') instanceof Organization) {
+            $eventField = AssociationField::new('event', 'Evènement')->setEmptyData($this->filterEvent)->setDisabled();
+        
+        } elseif ($this->filterOrganization) {
                 
                 $eventField = AssociationField::new('event', 'Evènement')->setQueryBuilder(function ($queryBuilder) {
                     $queryBuilder
-                    ->andWhere('entity.organization = :org')
-                    ->setParameter('org', $this->requestStack->getMainRequest()->getSession()->get('filterByElement'));
+                    ->andWhere('entity.event.organization = :org')
+                    ->setParameter('org', $this->filterOrganization);
                 });
-            } elseif ($this->requestStack->getMainRequest()->getSession()->get('filterByElement') instanceof Event) {
-                $selectedEvent = $this->eventRepository->find($this->requestStack->getMainRequest()->query->get('event'));
-                AssociationField::new('event', 'Evènement')->setEmptyData($selectedEvent)->setDisabled();
-            }
         }
 
         $fields = [];
@@ -110,7 +136,7 @@ class QuestCrudController extends AbstractCrudController
             case 'detail':
                 $fields = [
                     $eventField,
-                    AssociationField::new('zone'),
+                    $zoneField,
                     TextField::new('title', 'Titre'),
                     TextEditorField::new('infos'),
                     IntegerField::new('points'),
@@ -123,7 +149,7 @@ class QuestCrudController extends AbstractCrudController
                 $fields = [
                     TextField::new('title', 'Titre')->setTemplatePath('bundles/easyadmin/fields/text_linktodetail.html.twig'),
                     $eventField,
-                    AssociationField::new('zone'),
+                    $zoneField,
                     TextEditorField::new('infos'),
                     IntegerField::new('points'),
                     BooleanField::new('isSecret', 'Quête secrète ?')->renderAsSwitch(),
@@ -140,22 +166,28 @@ class QuestCrudController extends AbstractCrudController
         return $actions
         ->update(Crud::PAGE_INDEX, Action::NEW, function(Action $action) {
             $action->setLabel('Créer une quête');
-            $selected_event = null;
-
-            if ($this->requestStack->getMainRequest()->query->get('event')) {
-                $selected_event = $this->requestStack->getMainRequest()->query->get('event');
-            }elseif ($this->requestStack->getSession()->get('filterByElement') && $this->requestStack->getSession()->get('filterByElement') instanceof Event) {
-                $selected_event = $this->requestStack->getSession()->get('filterByElement')->getId();
+            if ($this->filterZone) {
+                return $action
+                ->linkToUrl(
+                    $this->adminUrlGenerator
+                    ->setController(QuestCrudController::class)
+                    ->setAction('new')
+                    ->set('zone', $this->filterZone->getId())
+                    ->generateUrl()
+                );
+            } elseif ($this->filterEvent) {
+                return $action
+                ->linkToUrl(
+                    $this->adminUrlGenerator
+                    ->setController(QuestCrudController::class)
+                    ->setAction('new')
+                    ->set('event', $this->filterEvent->getId())
+                    ->generateUrl()
+                );
+            } else {
+                return $action;
             }
 
-            return $action
-            ->linkToUrl(
-                $this->adminUrlGenerator
-                ->setController(QuestCrudController::class)
-                ->setAction('new')
-                ->set('event', $selected_event)
-                ->generateUrl()
-            );
         });
     }
 
