@@ -121,10 +121,24 @@ class ZoneCrudController extends AbstractCrudController
                         ->generateUrl();
                 }
             );
+        
+        $manageEntertainments = Action::new('manageEntertainments', 'Gérer les animations')
+        ->linkToUrl(
+            function (Zone $zone) {
+                return $this->adminUrlGenerator
+                    ->setController(EntertainmentCrudController::class)
+                    ->setAction('index')
+                    ->set('zone', $zone->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            }
+        );
 
         return $actions
             ->add(Crud::PAGE_INDEX, $newRpgZone)
             ->add(Crud::PAGE_DETAIL, $newRpgZone)
+            ->add(Crud::PAGE_INDEX, $manageEntertainments)
+            ->add(Crud::PAGE_DETAIL, $manageEntertainments)
             ->update(
                 Crud::PAGE_INDEX,
                 Action::NEW,
@@ -137,7 +151,7 @@ class ZoneCrudController extends AbstractCrudController
                                 $this->adminUrlGenerator
                                     ->setController(ZoneCrudController::class)
                                     ->setAction('new')
-                                    ->set('event', $this->filterEvent)
+                                    ->set('event', $this->filterEvent->getId())
                                     ->generateUrl()
                             );
                     }

@@ -26,7 +26,7 @@ class Entertainment extends AActivity
     #[ORM\JoinColumn(nullable: false)]
     private ?Zone $zone = null;
 
-    #[ORM\OneToMany(mappedBy: 'entertainment', targetEntity: EntertainmentSchedule::class)]
+    #[ORM\OneToMany(mappedBy: 'entertainment', targetEntity: EntertainmentSchedule::class, cascade:['remove'])]
     private Collection $entertainmentSchedules;
 
     public function __construct()
@@ -91,5 +91,10 @@ class Entertainment extends AActivity
         }
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
     }
 }

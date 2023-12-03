@@ -182,6 +182,15 @@ class EventCrudController extends AbstractCrudController
                     ->generateUrl();
             });
 
+            $manageEntertainments = Action::new('manageEntertainments', 'Gérer les animations')
+            ->linkToUrl(function (Event $event) {
+                return $this->adminUrlGenerator
+                    ->setController(EntertainmentCrudController::class)
+                    ->setAction('index')
+                    ->set('event', $event->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            });
 
         return $actions
             ->add(Crud::PAGE_INDEX, $managePaymentables)
@@ -189,17 +198,21 @@ class EventCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, $manageZones)
             ->add(Crud::PAGE_INDEX, $manageGuilds)
             ->add(Crud::PAGE_INDEX, $manageQuests)
+            ->add(Crud::PAGE_INDEX, $manageEntertainments)
+
             ->add(Crud::PAGE_DETAIL, $managePaymentables)
             ->add(Crud::PAGE_DETAIL, $manageRpgZones)
             ->add(Crud::PAGE_DETAIL, $manageZones)
             ->add(Crud::PAGE_DETAIL, $manageGuilds)
             ->add(Crud::PAGE_DETAIL, $manageQuests)
+            ->add(Crud::PAGE_DETAIL, $manageEntertainments)
+
             ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
                 return $action
                     ->setLabel('Créer un événement');
             })
-            ->reorder(Crud::PAGE_DETAIL, ['manageZones', 'manageRpgZones', 'managePaymentables', 'manageGuilds', 'manageQuests', 'edit', 'delete', 'index'])
-            ->reorder(Crud::PAGE_INDEX, ['manageZones', 'manageRpgZones', 'managePaymentables', 'manageGuilds', 'manageQuests', 'detail', 'edit', 'delete'])
+            ->reorder(Crud::PAGE_DETAIL, ['manageZones', 'manageRpgZones', 'managePaymentables', 'manageGuilds', 'manageQuests', 'manageEntertainments', 'edit', 'delete', 'index'])
+            ->reorder(Crud::PAGE_INDEX, ['manageZones', 'manageRpgZones', 'managePaymentables', 'manageGuilds', 'manageQuests', 'manageEntertainments', 'detail', 'edit', 'delete'])
             ;
     }
 

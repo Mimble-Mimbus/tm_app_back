@@ -20,7 +20,7 @@ class EntertainmentSchedule extends AActivitySchedule
     #[ORM\JoinColumn(nullable: false)]
     private ?Entertainment $entertainment = null;
 
-    #[ORM\OneToMany(mappedBy: 'entertainmentSchedule', targetEntity: EntertainmentReservation::class)]
+    #[ORM\OneToMany(mappedBy: 'entertainmentSchedule', targetEntity: EntertainmentReservation::class, cascade: ['remove'])]
     private Collection $entertainmentReservations;
 
     public function __construct()

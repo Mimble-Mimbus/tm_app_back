@@ -131,4 +131,9 @@ class Zone extends AZone
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->name;
+    }
 }

@@ -46,6 +46,10 @@ class PaymentableCrudController extends AbstractCrudController
             $this->filterEvent = $this->requestStack->getMainRequest()->query->get('event');
         }
 
+        if ($this->requestStack->getMainRequest()->query->get('organization')) {
+            $this->filterOrganization = $this->requestStack->getMainRequest()->query->get('organization');
+        }
+
         if ($this->filterEvent != null) {
             $this->filterEvent = $this->eventRepository->find($this->filterEvent);
         }
@@ -133,6 +137,14 @@ class PaymentableCrudController extends AbstractCrudController
                     ->setController(PaymentableCrudController::class)
                     ->setAction('new')
                     ->set('event', $this->filterEvent)
+                    ->generateUrl()
+                );
+            } elseif ($this->filterOrganization != null) {
+                return $action->linkToUrl(
+                    $this->adminUrlGenerator
+                    ->setController(PaymentableCrudController::class)
+                    ->setAction('new')
+                    ->set('organization', $this->filterOrganization)
                     ->generateUrl()
                 );
             }
