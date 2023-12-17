@@ -66,7 +66,7 @@ class Entertainment extends AActivity
     /**
      * @return Collection<int, EntertainmentSchedule>
      */
-    public function getActivitieSchedules(): Collection
+    public function getActivitySchedules(): Collection
     {
         return $this->entertainmentSchedules;
     }

@@ -14,6 +14,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder as ORMQueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -109,6 +112,7 @@ class RpgZoneCrudController extends AbstractCrudController
         if ($this->filterZone != null) {
 
             $zoneField = AssociationField::new('zone')->setEmptyData($this->filterZone)->setDisabled();
+
         } elseif ($this->filterOrganization != null) {
 
 
@@ -157,5 +161,24 @@ class RpgZoneCrudController extends AbstractCrudController
         $zone = $entityInstance->getZone();
         $zone->setRpgZone(null);
         parent::deleteEntity($entityManager, $entityInstance);
+    }
+
+    public function configureActions(Actions $actions) : Actions
+    {
+        $manageRpgActivities = Action::new('manageRpgActivities', 'Gérer les tables de JDR')
+        ->linkToUrl(
+            function (RpgZone $rpgZone) {
+                return $this->adminUrlGenerator
+                    ->setController(RpgActivityCrudController::class)
+                    ->setAction('index')
+                    ->set('rpgzone', $rpgZone->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            }
+        );
+
+        return $actions
+        ->add(Crud::PAGE_INDEX, $manageRpgActivities)
+        ->add(Crud::PAGE_DETAIL, $manageRpgActivities);
     }
 }
