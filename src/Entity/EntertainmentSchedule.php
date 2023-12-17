@@ -76,4 +76,9 @@ class EntertainmentSchedule extends AActivitySchedule
 
         return $this;
     }
+
+    public function __toString() {
+        $start = $this->getStart()->format('d-M-Y H:i');
+        return $start;
+    }
 }

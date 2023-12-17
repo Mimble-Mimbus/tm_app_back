@@ -47,7 +47,7 @@ class RpgActivity extends AActivity
     /**
      * @return Collection<int, RpgTable>
      */
-    public function getActivitieSchedules(): Collection
+    public function getActivitySchedules(): Collection
     {
         return $this->rpgTables;
     }

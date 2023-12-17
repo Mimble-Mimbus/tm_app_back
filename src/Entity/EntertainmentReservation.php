@@ -27,7 +27,7 @@ class EntertainmentReservation extends AActivityReservation
         return $this->id;
     }
 
-    public function getEntertainmentSchedule(): EntertainmentSchedule
+    public function getEntertainmentSchedule(): ?EntertainmentSchedule
     {
         return $this->getActivitySchedule();
     }
@@ -37,7 +37,7 @@ class EntertainmentReservation extends AActivityReservation
         return $this->setActivitySchedule($entertainmentSchedule);
     }
 
-    public function getActivitySchedule(): EntertainmentSchedule
+    public function getActivitySchedule(): ?EntertainmentSchedule
     {
         return $this->entertainmentSchedule;
     }

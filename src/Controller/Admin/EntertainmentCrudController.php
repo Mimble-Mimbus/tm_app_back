@@ -143,7 +143,20 @@ class EntertainmentCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        $manageSchedules = Action::new('manageSchedules', 'Gérer la programmation')
+        ->linkToUrl(
+            function (Entertainment $entertainment) {
+                return $this->adminUrlGenerator
+                    ->setController(EntertainmentScheduleCrudController::class)
+                    ->setAction('index')
+                    ->set('entertainment', $entertainment->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            }
+        );
         return $actions
+        ->add(Crud::PAGE_INDEX, $manageSchedules)
+        ->add(Crud::PAGE_DETAIL, $manageSchedules)
         ->update(
             Crud::PAGE_INDEX, 
             Action::NEW, 
