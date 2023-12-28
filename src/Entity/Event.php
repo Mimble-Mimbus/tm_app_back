@@ -60,6 +60,12 @@ class Event extends AStructure
     #[Groups('main')]
     private Collection $rpgZones;
 
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Transit::class, orphanRemoval: true)]
+    private Collection $transits;
+
+    #[ORM\Column(length: 255)]
+    private ?string $address = null;
+
     public function __construct()
     {
         $this->openDays = new ArrayCollection();
@@ -71,6 +77,7 @@ class Event extends AStructure
         $this->guilds = new ArrayCollection();
         $this->quests = new ArrayCollection();
         $this->rpgZones = new ArrayCollection();
+        $this->transits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -363,5 +370,47 @@ class Event extends AStructure
     public function __toString()
     {
         return $this->name;
+    }
+
+    /**
+     * @return Collection<int, Transit>
+     */
+    public function getTransits(): Collection
+    {
+        return $this->transits;
+    }
+
+    public function addTransit(Transit $transit): static
+    {
+        if (!$this->transits->contains($transit)) {
+            $this->transits->add($transit);
+            $transit->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransit(Transit $transit): static
+    {
+        if ($this->transits->removeElement($transit)) {
+            // set the owning side to null (unless already changed)
+            if ($transit->getEvent() === $this) {
+                $transit->setEvent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(string $address): static
+    {
+        $this->address = $address;
+
+        return $this;
     }
 }

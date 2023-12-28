@@ -2,6 +2,8 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Event;
+use App\Repository\EventRepository;
 use App\Repository\OrganizationRepository;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,5 +39,70 @@ class ApiController extends AbstractController
         } else {
             return new JsonResponse(['error' => "L'organisation recherchée n'existe pas."]);
         }
+    }
+
+
+    #[Route('/get_event_informations/{id}', name: 'get_event_informations')]
+    public function getEventInformations (EventRepository $eventRepository, int $id) {
+        /** @var Event */
+        $event  = $eventRepository->findOneById($id);
+
+        if(!$event) {
+            return new JsonResponse(['error' => "event deosn't existe"]);
+        }
+
+        $openDays = [];
+        $paymentables = [];
+        $transits = [];
+
+
+        foreach ($event->getOpenDays() as $openDay) {
+            $openDays[] = [
+                'dayStart' => $openDay->getDayStart(),
+                'dayEnd' => $openDay->getDayEnd(),
+            ];
+        }
+
+        foreach ($event->getTransits() as $transit) {
+            $transits[] = [
+              'name' => $transit->getName(),
+              'address' => $transit->getAddress(),
+              'start' => $transit->getStart(),
+              'arrival' => $transit->getArrival(),
+              'availableSeats' => $transit->getAvailableSeats(),
+            ];
+        }
+
+        foreach ($event->getPaymentables() as $paymentable) {
+            $prices = [];
+
+            $type = $paymentable->getTypePaymentable()->getName();
+
+            if ($type !== 'consommable buvette') {
+              continue;
+            }
+
+            foreach ($paymentable->getPrices() as $price) {
+                $prices[] = [
+                    'price' =>  $price->getPrice(), 
+                    'condition' => $price->getPriceCondition()
+                ];
+            }
+
+            $paymentables[] = [
+              'type' => $type,
+              'priceDetails' => $prices,
+              'name' => $paymentable->getName()
+            ];
+        }
+
+        $response = [
+            'id' => $event->getId(),
+            'paymentables' => $paymentables,
+            "openDay" => $openDays,
+            'transits' => $transits
+        ];
+
+        return $this->json($response, 200, [], ["groups" => "main"]);
     }
 }

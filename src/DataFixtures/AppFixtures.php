@@ -22,6 +22,7 @@ use App\Factory\RpgReservationFactory;
 use App\Factory\RpgTableFactory;
 use App\Factory\RpgZoneFactory;
 use App\Factory\TagFactory;
+use App\Factory\TransitFactory;
 use App\Factory\TriggerWarningFactory;
 use App\Factory\TypePaymentableFactory;
 use App\Factory\UrlFactory;
@@ -33,6 +34,7 @@ use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Validator\Constraints\Length;
+use function Zenstruck\Foundry\faker;
 
 class AppFixtures extends Fixture
 {
@@ -53,7 +55,8 @@ class AppFixtures extends Fixture
         $events = EventFactory::createMany(7, function () {
             return [
                 'organization' => OrganizationFactory::random(),
-                'urls' => UrlFactory::createMany(2)
+                'urls' => UrlFactory::createMany(2),
+                'address' => faker()->address(),
             ];
         });
 
@@ -142,6 +145,17 @@ class AppFixtures extends Fixture
                     'zone' => ZoneFactory::random(['event' => $event]),
                     'isSecret' => $isSecret == 1 ? true : false,
                     'guild' => $isSecret == 1 ? GuildFactory::random(['event' => $event]) : null
+                ];
+            });
+
+            TransitFactory::createMany(rand(2, 5), function () use ($event) {
+                return [
+                    'start' =>  new DateTime(faker()->date()),
+                    'arrival' => new DateTime(faker()->date()),
+                    'name' => faker()->randomLetter().faker()->randomNumber(3),
+                    'address' => faker()->address(),
+                    'availableSeats' => faker()->randomNumber(2),
+                    'event' => $event
                 ];
             });
         }
