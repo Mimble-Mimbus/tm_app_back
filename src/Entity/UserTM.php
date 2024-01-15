@@ -19,8 +19,8 @@ class UserTM extends AUser
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: EntertainmentReservation::class)]
     private Collection $entertainmentReservations;
 
-    #[ORM\OneToMany(mappedBy: 'userGm', targetEntity: RpgTable::class)]
-    private Collection $rpgTables;
+    #[ORM\OneToMany(mappedBy: 'userGm', targetEntity: RpgActivity::class)]
+    private Collection $rpgActivities;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: RpgReservation::class)]
     private Collection $rpgReservations;
@@ -35,7 +35,7 @@ class UserTM extends AUser
     {
         parent::__construct();
         $this->entertainmentReservations = new ArrayCollection();
-        $this->rpgTables = new ArrayCollection();
+        $this->rpgActivities = new ArrayCollection();
         $this->rpgReservations = new ArrayCollection();
     }
     
@@ -75,29 +75,29 @@ class UserTM extends AUser
     }
 
     /**
-     * @return Collection<int, RpgTable>
+     * @return Collection<int, RpgActivity>
      */
-    public function getRpgTables(): Collection
+    public function getRpgActivities(): Collection
     {
-        return $this->rpgTables;
+        return $this->rpgActivities;
     }
 
-    public function addRpgTable(RpgTable $rpgTable): static
+    public function addRpgActivity(RpgActivity $rpgActivity): static
     {
-        if (!$this->rpgTables->contains($rpgTable)) {
-            $this->rpgTables->add($rpgTable);
-            $rpgTable->setUserGm($this);
+        if (!$this->rpgActivities->contains($rpgActivity)) {
+            $this->rpgActivities->add($rpgActivity);
+            $rpgActivity->setUserGm($this);
         }
 
         return $this;
     }
 
-    public function removeRpgTable(RpgTable $rpgTable): static
+    public function removeRpgActivity(RpgActivity $rpgActivity): static
     {
-        if ($this->rpgTables->removeElement($rpgTable)) {
+        if ($this->rpgActivities->removeElement($rpgActivity)) {
             // set the owning side to null (unless already changed)
-            if ($rpgTable->getUserGm() === $this) {
-                $rpgTable->setUserGm(null);
+            if ($rpgActivity->getUserGm() === $this) {
+                $rpgActivity->setUserGm(null);
             }
         }
 

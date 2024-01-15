@@ -18,15 +18,15 @@ class TriggerWarning
     #[ORM\Column(length: 255)]
     private ?string $theme = null;
 
-    #[ORM\ManyToMany(targetEntity: RpgTable::class, mappedBy: 'triggerWarnings')]
-    private Collection $rpgTables;
+    #[ORM\ManyToMany(targetEntity: RpgActivity::class, mappedBy: 'triggerWarnings')]
+    private Collection $rpgActivities;
 
     #[ORM\ManyToMany(targetEntity: Rpg::class, mappedBy: 'triggerWarnings')]
     private Collection $rpgs;
 
     public function __construct()
     {
-        $this->rpgTables = new ArrayCollection();
+        $this->rpgActivities = new ArrayCollection();
         $this->rpgs = new ArrayCollection();
     }
 
@@ -48,27 +48,27 @@ class TriggerWarning
     }
 
     /**
-     * @return Collection<int, RpgTable>
+     * @return Collection<int, RpgActivity>
      */
-    public function getRpgTables(): Collection
+    public function getRpgActivities(): Collection
     {
-        return $this->rpgTables;
+        return $this->rpgActivities;
     }
 
-    public function addRpgTable(RpgTable $rpgTable): static
+    public function addRpgActivity(RpgActivity $rpgActivity): static
     {
-        if (!$this->rpgTables->contains($rpgTable)) {
-            $this->rpgTables->add($rpgTable);
-            $rpgTable->addTriggerWarning($this);
+        if (!$this->rpgActivities->contains($rpgActivity)) {
+            $this->rpgActivities->add($rpgActivity);
+            $rpgActivity->addTriggerWarning($this);
         }
 
         return $this;
     }
 
-    public function removeRpgTable(RpgTable $rpgTable): static
+    public function removeRpgActivity(RpgActivity $rpgActivity): static
     {
-        if ($this->rpgTables->removeElement($rpgTable)) {
-            $rpgTable->removeTriggerWarning($this);
+        if ($this->rpgActivities->removeElement($rpgActivity)) {
+            $rpgActivity->removeTriggerWarning($this);
         }
 
         return $this;

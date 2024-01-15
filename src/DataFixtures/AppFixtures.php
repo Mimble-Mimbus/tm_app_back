@@ -220,7 +220,11 @@ class AppFixtures extends Fixture
 
                 RpgActivityFactory::createMany(5, function () use ($rpgZone) {
                     return [
-                        'rpgZone' => $rpgZone
+                        'rpgZone' => $rpgZone,
+                        'userGm' => UserTMFactory::random(),
+                        'rpg' => RpgFactory::random(),
+                        'tags' => TagFactory::randomRange(1, 3),
+                        'triggerWarnings' => TriggerWarningFactory::randomRange(0, 3)
                     ];
                 });
             }
@@ -229,7 +233,8 @@ class AppFixtures extends Fixture
         RpgTableFactory::createMany(8, function () {
             return [
                 'rpgActivity' => RpgActivityFactory::random(),
-                'userGm' => UserTMFactory::random()
+                'isCanceled' => rand(0, 1)
+
             ];
         });
 

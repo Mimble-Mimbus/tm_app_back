@@ -18,15 +18,15 @@ class Tag
     #[ORM\Column(length: 255)]
     private ?string $tag = null;
 
-    #[ORM\ManyToMany(targetEntity: RpgTable::class, mappedBy: 'tags')]
-    private Collection $rpgTables;
+    #[ORM\ManyToMany(targetEntity: RpgActivity::class, mappedBy: 'tags')]
+    private Collection $rpgActivities;
 
     #[ORM\ManyToMany(targetEntity: Rpg::class, mappedBy: 'tags')]
     private Collection $rpgs;
 
     public function __construct()
     {
-        $this->rpgTables = new ArrayCollection();
+        $this->rpgActivities = new ArrayCollection();
         $this->rpgs = new ArrayCollection();
     }
 
@@ -48,27 +48,27 @@ class Tag
     }
 
     /**
-     * @return Collection<int, RpgTable>
+     * @return Collection<int, RpgActivity>
      */
-    public function getRpgTables(): Collection
+    public function getRpgActivities(): Collection
     {
-        return $this->rpgTables;
+        return $this->rpgActivities;
     }
 
-    public function addRpgTable(RpgTable $rpgTable): static
+    public function addRpgTable(RpgActivity $rpgActivity): static
     {
-        if (!$this->rpgTables->contains($rpgTable)) {
-            $this->rpgTables->add($rpgTable);
-            $rpgTable->addTag($this);
+        if (!$this->rpgActivities->contains($rpgActivity)) {
+            $this->rpgActivities->add($rpgActivity);
+            $rpgActivity->addTag($this);
         }
 
         return $this;
     }
 
-    public function removeRpgTable(RpgTable $rpgTable): static
+    public function removeRpgTable(RpgActivity $rpgActivity): static
     {
-        if ($this->rpgTables->removeElement($rpgTable)) {
-            $rpgTable->removeTag($this);
+        if ($this->rpgActivities->removeElement($rpgActivity)) {
+            $rpgActivity->removeTag($this);
         }
 
         return $this;

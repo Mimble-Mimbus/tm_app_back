@@ -20,27 +20,15 @@ class RpgTable extends AActivitySchedule
     #[ORM\JoinColumn(nullable: false)]
     private ?RpgActivity $rpgActivity = null;
 
-    #[ORM\ManyToOne(inversedBy: 'rpgTables')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?UserTM $userGm = null;
-
     #[ORM\OneToMany(mappedBy: 'rpgTable', targetEntity: RpgReservation::class, cascade: ['remove'])]
     private Collection $rpgReservations;
 
-    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'rpgTables')]
-    private Collection $tags;
-
-    #[ORM\ManyToMany(targetEntity: TriggerWarning::class, inversedBy: 'rpgTables')]
-    private Collection $triggerWarnings;
-
-    #[ORM\ManyToOne(inversedBy: 'rpgTables')]
-    private ?Rpg $rpg = null;
+    
 
     public function __construct()
     {
         $this->rpgReservations = new ArrayCollection();
-        $this->tags = new ArrayCollection();
-        $this->triggerWarnings = new ArrayCollection();
+        
     }
 
     public function getId(): ?int
@@ -60,17 +48,7 @@ class RpgTable extends AActivitySchedule
         return $this;
     }
 
-    public function getUserGm(): ?UserTM
-    {
-        return $this->userGm;
-    }
-
-    public function setUserGm(?UserTM $userGm): static
-    {
-        $this->userGm = $userGm;
-
-        return $this;
-    }
+    
 
     /**
      * @return Collection<int, RpgReservation>
@@ -100,65 +78,9 @@ class RpgTable extends AActivitySchedule
         }
 
         return $this;
-    }
+    }   
 
-    /**
-     * @return Collection<int, Tag>
-     */
-    public function getTags(): Collection
-    {
-        return $this->tags;
-    }
-
-    public function addTag(Tag $tag): static
-    {
-        if (!$this->tags->contains($tag)) {
-            $this->tags->add($tag);
-        }
-
-        return $this;
-    }
-
-    public function removeTag(Tag $tag): static
-    {
-        $this->tags->removeElement($tag);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, TriggerWarning>
-     */
-    public function getTriggerWarnings(): Collection
-    {
-        return $this->triggerWarnings;
-    }
-
-    public function addTriggerWarning(TriggerWarning $triggerWarning): static
-    {
-        if (!$this->triggerWarnings->contains($triggerWarning)) {
-            $this->triggerWarnings->add($triggerWarning);
-        }
-
-        return $this;
-    }
-
-    public function removeTriggerWarning(TriggerWarning $triggerWarning): static
-    {
-        $this->triggerWarnings->removeElement($triggerWarning);
-
-        return $this;
-    }
-
-    public function getRpg(): ?Rpg
-    {
-        return $this->rpg;
-    }
-
-    public function setRpg(?Rpg $rpg): static
-    {
-        $this->rpg = $rpg;
-
-        return $this;
+    public function __toString() {
+        return date_format($this->getStart(), 'd/m/Y H:i');
     }
 }
