@@ -68,7 +68,7 @@ class AppFixtures extends Fixture
             ]);
         }
 
-        PaymentableFactory::createMany(20, function () {
+        $paymentables = PaymentableFactory::createMany(20, function () {
             $array = ['billet entrée' => [
                 'ticket entrée',
                 'ticket soirée',
@@ -103,9 +103,25 @@ class AppFixtures extends Fixture
             return [
                 'name' => $array[$type][rand(0, count($array[$type]) -1)],
                 'event' => EventFactory::random(),
-                'typePaymentable' => TypePaymentableFactory::random(['name' => $type])
+                'typePaymentable' => TypePaymentableFactory::random(['name' => $type]),
             ];
         });
+
+        PriceFactory::createMany(20, function () {
+            return [
+                'paymentable' => PaymentableFactory::random()
+            ];
+        });
+
+        foreach ($paymentables as $paymentable) {
+            if (($paymentable->getTypePaymentable()->getName() === 'consommable buvette') && $paymentable->getPrices()->isEmpty()) {
+                PriceFactory::createOne([
+                    'paymentable' => $paymentable,
+                    'priceCondition' => null
+                ]);
+            }
+            
+        }
 
         PriceFactory::createMany(20, function () {
             return [
@@ -150,11 +166,6 @@ class AppFixtures extends Fixture
 
             TransitFactory::createMany(rand(2, 5), function () use ($event) {
                 return [
-                    'start' =>  new DateTime(faker()->date()),
-                    'arrival' => new DateTime(faker()->date()),
-                    'name' => faker()->randomLetter().faker()->randomNumber(3),
-                    'address' => faker()->address(),
-                    'availableSeats' => faker()->randomNumber(2),
                     'event' => $event
                 ];
             });

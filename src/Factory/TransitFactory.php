@@ -4,6 +4,7 @@ namespace App\Factory;
 
 use App\Entity\Transit;
 use App\Repository\TransitRepository;
+use DateTime;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
@@ -48,11 +49,11 @@ final class TransitFactory extends ModelFactory
     {
         return [
             'address' => self::faker()->address(),
-            'arrival' => self::faker()->time(),
+            'arrival' =>  new DateTime(self::faker()->time()),
             'availableSeats' => self::faker()->randomNumber(2),
             'event' => EventFactory::new(),
-            'name' => self::faker()->text(255),
-            'start' => self::faker()->time(),
+            'name' => self::faker()->randomLetter().self::faker()->numberBetween(0, 99),
+            'start' => new DateTime(self::faker()->time()),
         ];
     }
 

@@ -48,7 +48,7 @@ class ApiController extends AbstractController
         $event  = $eventRepository->findOneById($id);
 
         if(!$event) {
-            return new JsonResponse(['error' => "event deosn't existe"]);
+            return new JsonResponse(['error' => "event deosn't existe"], 404);
         }
 
         $openDays = [];
@@ -99,8 +99,9 @@ class ApiController extends AbstractController
         $response = [
             'id' => $event->getId(),
             'paymentables' => $paymentables,
-            "openDay" => $openDays,
-            'transits' => $transits
+            "openDays" => $openDays,
+            'transits' => $transits,
+            'address' => $event->getAddress()
         ];
 
         return $this->json($response, 200, [], ["groups" => "main"]);
