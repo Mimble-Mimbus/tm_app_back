@@ -47,7 +47,7 @@ final class TagFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'tag' => self::faker()->unique()->words(3, true),
+            'tag' => self::faker()->unique()->words(2, true),
         ];
     }
 

@@ -114,7 +114,7 @@ class EventCrudController extends AbstractCrudController
                     CollectionField::new('guilds', 'Guildes')->useEntryCrudForm(NewEventGuildCrudController::class),
 
                     FormField::addTab('Facturables'),
-                    CollectionField::new('paymentables', 'Facturables')->useEntryCrudForm(PaymentableCrudController::class)
+                    CollectionField::new('paymentables', 'Facturables')->useEntryCrudForm(NewEventPaymentableCrudController::class)
                 ];
                 break;
             case 'index':

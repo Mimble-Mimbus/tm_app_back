@@ -115,11 +115,10 @@ class RpgZoneCrudController extends AbstractCrudController
 
         } elseif ($this->filterOrganization != null) {
 
-
             $zoneField = AssociationField::new('zone')->setQueryBuilder(function ($queryBuilder) {
                 $queryBuilder
                     ->join(Event::class, 'e', 'WITH', 'entity.event = e')
-                    ->andWhere('event.organization = :org')
+                    ->andWhere('e.organization = :org')
                     ->setParameter('org', $this->filterOrganization);
             });
         } elseif ($this->filterEvent != null) {
@@ -165,7 +164,7 @@ class RpgZoneCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions) : Actions
     {
-        $manageRpgActivities = Action::new('manageRpgActivities', 'Gérer les tables de JDR')
+        $manageRpgActivities = Action::new('manageRpgActivities', 'Gérer les JDR proposés')
         ->linkToUrl(
             function (RpgZone $rpgZone) {
                 return $this->adminUrlGenerator

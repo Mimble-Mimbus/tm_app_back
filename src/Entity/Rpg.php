@@ -28,8 +28,8 @@ class Rpg
     #[ORM\Column(length: 255)]
     private ?string $universe = null;
 
-    #[ORM\OneToMany(mappedBy: 'rpg', targetEntity: RpgTable::class)]
-    private Collection $rpgTables;
+    #[ORM\OneToMany(mappedBy: 'rpg', targetEntity: RpgActivity::class)]
+    private Collection $rpgActivities;
 
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'rpgs')]
     private Collection $tags;
@@ -39,7 +39,7 @@ class Rpg
 
     public function __construct()
     {
-        $this->rpgTables = new ArrayCollection();
+        $this->rpgActivities = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->triggerWarnings = new ArrayCollection();
     }
@@ -98,29 +98,29 @@ class Rpg
     }
 
     /**
-     * @return Collection<int, RpgTable>
+     * @return Collection<int, RpgActivity>
      */
-    public function getRpgTables(): Collection
+    public function getRpgActivities(): Collection
     {
-        return $this->rpgTables;
+        return $this->rpgActivities;
     }
 
-    public function addRpgTable(RpgTable $rpgTable): static
+    public function addRpgActivity(RpgActivity $rpgActivity): static
     {
-        if (!$this->rpgTables->contains($rpgTable)) {
-            $this->rpgTables->add($rpgTable);
-            $rpgTable->setRpg($this);
+        if (!$this->rpgActivities->contains($rpgActivity)) {
+            $this->rpgActivities->add($rpgActivity);
+            $rpgActivity->setRpg($this);
         }
 
         return $this;
     }
 
-    public function removeRpgTable(RpgTable $rpgTable): static
+    public function removeRpgActivity(RpgActivity $rpgActivity): static
     {
-        if ($this->rpgTables->removeElement($rpgTable)) {
+        if ($this->rpgActivities->removeElement($rpgActivity)) {
             // set the owning side to null (unless already changed)
-            if ($rpgTable->getRpg() === $this) {
-                $rpgTable->setRpg(null);
+            if ($rpgActivity->getRpg() === $this) {
+                $rpgActivity->setRpg(null);
             }
         }
 
@@ -173,5 +173,9 @@ class Rpg
         $this->triggerWarnings->removeElement($triggerWarning);
 
         return $this;
+    }
+
+    public function __toString() {
+        return $this->name;
     }
 }
