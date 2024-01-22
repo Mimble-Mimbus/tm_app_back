@@ -26,10 +26,10 @@ class RpgActivity extends AActivity
     #[ORM\JoinColumn(nullable: false)]
     private ?UserTM $userGm = null;
 
-    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'rpgActivity')]
+    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'rpgActivity', cascade: ['persist'])]
     private Collection $tags;
 
-    #[ORM\ManyToMany(targetEntity: TriggerWarning::class, inversedBy: 'rpgActivity')]
+    #[ORM\ManyToMany(targetEntity: TriggerWarning::class, inversedBy: 'rpgActivity', cascade: ['persist'])]
     private Collection $triggerWarnings;
 
     #[ORM\ManyToOne(inversedBy: 'rpgActivity')]

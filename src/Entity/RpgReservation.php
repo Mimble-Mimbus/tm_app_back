@@ -26,20 +26,20 @@ class RpgReservation extends AActivityReservation
     {
         return $this->id;
     }
-
-    public function getActivitySchedule(): ?RpgTable
-    {
-        return $this->rpgTable;
-    }
-
+    
     public function getRpgTable()
     {
         return $this->getActivitySchedule();
     }
-
+    
     public function setRpgTable(RpgTable $rpgTable)
     {
         $this->setActivitySchedule($rpgTable);
+    }
+    
+    public function getActivitySchedule(): ?RpgTable
+    {
+        return $this->rpgTable;
     }
 
     public function setActivitySchedule($rpgTable): static
