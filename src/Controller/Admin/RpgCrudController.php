@@ -21,7 +21,7 @@ class RpgCrudController extends AbstractCrudController
     {
         return [
             TextField::new('name', 'Nom'),
-            TextEditorField::new('description'),
+            TextEditorField::new('description')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
             TextField::new('publisher', 'Editeur'),
             TextField::new('universe', 'Univers'),
             CollectionField::new('tags')->useEntryCrudForm(TagCrudController::class),
