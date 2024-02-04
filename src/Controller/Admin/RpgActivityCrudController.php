@@ -132,7 +132,7 @@ class RpgActivityCrudController extends AbstractCrudController
             AssociationField::new('userGm', 'MJ'),
             AssociationField::new('rpg', 'JDR')->setCrudController(RpgCrudController::class),
             TextField::new('name', 'Nom')->setTemplatePath('bundles/easyadmin/fields/text_linktodetail.html.twig'),
-            TextEditorField::new('description'),
+            TextEditorField::new('description')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
             CollectionField::new('tags')->useEntryCrudForm(TagCrudController::class),
             CollectionField::new('triggerWarnings')->useEntryCrudForm(TriggerWarningCrudController::class),
             IntegerField::new('maxNumberSeats', 'Nombre de places max'),
