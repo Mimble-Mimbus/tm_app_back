@@ -143,6 +143,9 @@ class EventCrudController extends AbstractCrudController
             });
 
         $manageRpgZones = Action::new('manageRpgZones', 'Gérer les zones de JDR')
+            ->displayIf(function (Event $event) {
+                return count($event->getZones()) > 0;
+            })
             ->linkToUrl(function (Event $event) {
                 return $this->adminUrlGenerator
                     ->setController(RpgZoneCrudController::class)
