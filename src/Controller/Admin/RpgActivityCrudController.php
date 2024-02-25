@@ -6,9 +6,13 @@ use App\Entity\Event;
 use App\Entity\Organization;
 use App\Entity\RpgActivity;
 use App\Entity\RpgZone;
+use App\Entity\Tag;
 use App\Entity\Zone;
+use App\Form\TagType;
+use App\Form\TwType;
 use App\Repository\EventRepository;
 use App\Repository\RpgZoneRepository;
+use App\Repository\TagRepository;
 use App\Repository\ZoneRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -28,7 +32,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class RpgActivityCrudController extends AbstractCrudController
@@ -44,7 +47,8 @@ class RpgActivityCrudController extends AbstractCrudController
         private EventRepository $eventRepository,
         private ZoneRepository $zoneRepository,
         private RpgZoneRepository $rpgZoneRepository,
-        private AdminUrlGenerator $adminUrlGenerator
+        private AdminUrlGenerator $adminUrlGenerator,
+        private TagRepository $tagRepository
     ){
         if ($this->requestStack->getSession()->get('filterByElement')) {
             $element = $this->requestStack->getSession()->get('filterByElement');
@@ -133,8 +137,10 @@ class RpgActivityCrudController extends AbstractCrudController
             AssociationField::new('rpg', 'JDR')->setCrudController(RpgCrudController::class),
             TextField::new('name', 'Nom')->setTemplatePath('bundles/easyadmin/fields/text_linktodetail.html.twig'),
             TextEditorField::new('description')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
-            CollectionField::new('tags')->useEntryCrudForm(TagCrudController::class),
-            CollectionField::new('triggerWarnings')->useEntryCrudForm(TriggerWarningCrudController::class),
+            CollectionField::new('tags')->allowAdd()->setFormTypeOptions([
+                'attr' => ['data-controller' => 'autocomplete']
+            ]),
+            CollectionField::new('triggerWarnings')->setEntryType(TwType::class)->allowAdd(),
             IntegerField::new('maxNumberSeats', 'Nombre de places max'),
             NumberField::new('duration', 'Durée'),
             BooleanField::new('onReservation', 'Sur réservation')->renderAsSwitch(),
