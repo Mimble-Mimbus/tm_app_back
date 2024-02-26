@@ -22,6 +22,7 @@ use App\Factory\RpgReservationFactory;
 use App\Factory\RpgTableFactory;
 use App\Factory\RpgZoneFactory;
 use App\Factory\TagFactory;
+use App\Factory\TransitFactory;
 use App\Factory\TriggerWarningFactory;
 use App\Factory\TypePaymentableFactory;
 use App\Factory\UrlFactory;
@@ -33,6 +34,7 @@ use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Validator\Constraints\Length;
+use function Zenstruck\Foundry\faker;
 
 class AppFixtures extends Fixture
 {
@@ -53,7 +55,8 @@ class AppFixtures extends Fixture
         $events = EventFactory::createMany(7, function () {
             return [
                 'organization' => OrganizationFactory::random(),
-                'urls' => UrlFactory::createMany(2)
+                'urls' => UrlFactory::createMany(2),
+                'address' => faker()->address(),
             ];
         });
 
@@ -65,7 +68,7 @@ class AppFixtures extends Fixture
             ]);
         }
 
-        PaymentableFactory::createMany(20, function () {
+        $paymentables = PaymentableFactory::createMany(20, function () {
             $array = ['billet entrée' => [
                 'ticket entrée',
                 'ticket soirée',
@@ -100,9 +103,25 @@ class AppFixtures extends Fixture
             return [
                 'name' => $array[$type][rand(0, count($array[$type]) -1)],
                 'event' => EventFactory::random(),
-                'typePaymentable' => TypePaymentableFactory::random(['name' => $type])
+                'typePaymentable' => TypePaymentableFactory::random(['name' => $type]),
             ];
         });
+
+        PriceFactory::createMany(20, function () {
+            return [
+                'paymentable' => PaymentableFactory::random()
+            ];
+        });
+
+        foreach ($paymentables as $paymentable) {
+            if (($paymentable->getTypePaymentable()->getName() === 'consommable buvette') && $paymentable->getPrices()->isEmpty()) {
+                PriceFactory::createOne([
+                    'paymentable' => $paymentable,
+                    'priceCondition' => null
+                ]);
+            }
+            
+        }
 
         PriceFactory::createMany(20, function () {
             return [
@@ -142,6 +161,12 @@ class AppFixtures extends Fixture
                     'zone' => ZoneFactory::random(['event' => $event]),
                     'isSecret' => $isSecret == 1 ? true : false,
                     'guild' => $isSecret == 1 ? GuildFactory::random(['event' => $event]) : null
+                ];
+            });
+
+            TransitFactory::createMany(rand(2, 5), function () use ($event) {
+                return [
+                    'event' => $event
                 ];
             });
         }

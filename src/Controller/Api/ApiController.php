@@ -2,6 +2,8 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Event;
+use App\Repository\EventRepository;
 use App\Repository\OrganizationRepository;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,6 +35,7 @@ class ApiController extends AbstractController
                 'urls' => $urls,
                 'email' => $organization->getEmail()
             ];
+
             return $this->json($response, 200, [], ["groups" => "main"]);
         } else {
             return new JsonResponse(['error' => "L'organisation recherchée n'existe pas."]);

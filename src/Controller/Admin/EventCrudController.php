@@ -103,6 +103,7 @@ class EventCrudController extends AbstractCrudController
                     FormField::addTab('Informations générales'),
                     $org_field,
                     TextField::new('name', 'Nom'),
+                    TextEditorField::new('address', 'adresse'),
                     TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
                     CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class)->setTemplatePath('bundles/easyadmin/fields/collection_urllist.html.twig'),
                     CollectionField::new('openDays', "Jours d'ouverture")->useEntryCrudForm(OpenDayCrudController::class)->setHelp("Date et horaires de chaque jour d'ouverture")->setTemplatePath('bundles/easyadmin/fields/collection_opendaylist.html.twig'),
@@ -120,6 +121,7 @@ class EventCrudController extends AbstractCrudController
             case 'index':
                 $fields = [
                     TextField::new('name', 'Nom')->setTemplatePath('bundles/easyadmin/fields/text_linktodetail.html.twig'),
+                    TextEditorField::new('address', 'Adresse')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
                     TextEditorField::new('presentation', 'Présentation')->setTemplatePath('bundles/easyadmin/fields/texteditor.html.twig'),
                     $org_field,
                     CollectionField::new('urls', 'Urls')->useEntryCrudForm(UrlCrudController::class)->setTemplatePath('bundles/easyadmin/fields/collection_urllist.html.twig'),
