@@ -7,12 +7,14 @@ use App\Entity\Organization;
 use App\Entity\VolunteerShift;
 use App\Entity\Zone;
 use App\Repository\EventRepository;
+use App\Repository\OrganizationRepository;
 use App\Repository\UserTMRepository;
 use App\Repository\ZoneRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
@@ -21,6 +23,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class VolunteerShiftCrudController extends AbstractCrudController
@@ -35,7 +38,8 @@ class VolunteerShiftCrudController extends AbstractCrudController
         private RequestStack $requestStack,
         private EventRepository $eventRepository,
         private ZoneRepository $zoneRepository,
-        private UserTMRepository $userTMRepository
+        private UserTMRepository $userTMRepository,
+        private OrganizationRepository $organizationRepository
     ){
         if ($this->requestStack->getSession()->get('filterByElement')) {
             $element = $this->requestStack->getSession()->get('filterByElement');
@@ -121,7 +125,7 @@ class VolunteerShiftCrudController extends AbstractCrudController
             'crud/index' => 'bundles/easyadmin/volunteer_plannings/index.html.twig'
         ]);
         if ($this->filterVolunteer) {
-            $crud->setPageTitle('index', 'Planning de ' . $this->filterVolunteer);            
+            $crud->setPageTitle('index', 'Planning de ' . $this->filterVolunteer);
         } elseif ($this->filterZone) {
             $crud->setPageTitle('index', 'Planning des bénévoles pour la zone ' . $this->filterZone);
         } elseif ($this->filterEvent) {
@@ -131,4 +135,32 @@ class VolunteerShiftCrudController extends AbstractCrudController
         }
         return $crud;
     }
+
+    public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
+    {
+        if (Crud::PAGE_INDEX === $responseParameters->get('pageName')) {
+            $filter = null;
+            $filter_id = null;
+            if ($this->filterVolunteer) {
+                $filter = 'volunteer';
+                $filter_id = $this->filterVolunteer->getId();
+            } elseif ($this->filterZone) {
+                $filter = 'zone';
+                $filter_id = $this->filterZone->getId();
+            } elseif ($this->filterEvent) {
+                $filter = 'event';
+                $filter_id = $this->filterEvent->getId();
+            } elseif ($this->filterOrganization) {
+                $filter = 'organization';  
+                $filter_id = $this->filterOrganization->getId();  
+            }
+            $responseParameters->set('calendar_filter', $filter);
+            $responseParameters->set('calendar_filter_id', $filter_id);
+
+        }
+
+        return $responseParameters;
+    }
+
+    
 }

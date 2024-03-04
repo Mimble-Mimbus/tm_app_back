@@ -5,7 +5,17 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 
 export default class extends Controller {
+
+    static values = { filter: String, id: Number }
+
     connect() {
+
+        fetch('/admin/ajax/get_calendar/?filter=' + this.filterValue + '&id=' + this.idValue)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+        ;
 
         let calendarEl = this.element;
         let calendar = new Calendar(calendarEl, {
