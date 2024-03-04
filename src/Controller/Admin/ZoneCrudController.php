@@ -134,11 +134,25 @@ class ZoneCrudController extends AbstractCrudController
             }
         );
 
+        $displayVonlunteerCalendar = Action::new('displayVonlunteerCalendar', 'Voir le planning des bénévoles')
+        ->linkToUrl(
+            function (Zone $zone) {
+                return $this->adminUrlGenerator
+                    ->setController(VolunteerShiftCrudController::class)
+                    ->setAction('index')
+                    ->set('zone', $zone->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            }
+        );
+
         return $actions
             ->add(Crud::PAGE_INDEX, $newRpgZone)
             ->add(Crud::PAGE_DETAIL, $newRpgZone)
             ->add(Crud::PAGE_INDEX, $manageEntertainments)
             ->add(Crud::PAGE_DETAIL, $manageEntertainments)
+            ->add(Crud::PAGE_INDEX, $displayVonlunteerCalendar)
+            ->add(Crud::PAGE_DETAIL, $displayVonlunteerCalendar)
             ->update(
                 Crud::PAGE_INDEX,
                 Action::NEW,
