@@ -81,4 +81,16 @@ class EntertainmentSchedule extends AActivitySchedule
         $start = $this->getStart()->format('d-M-Y H:i');
         return $start;
     }
+
+    public function getAvailableSeats () 
+    {
+        $max = $this->getEntertainment()->getMaxNumberSeats();
+        $count = 0;
+
+        foreach ($this->getActivityReservations() as $reservation) {
+            $count += $reservation->getBookings();
+        }
+
+        return ($max - $count);
+    }
 }
