@@ -12,7 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class EventController extends AbstractController
 {
     #[Route('/get_event_informations/{id}', name: 'get_event_informations')]
-    public function getEventInformations (EventRepository $eventRepository, int $id) {
+    public function getEventInformations (EventRepository $eventRepository, int $id) 
+    {
         /** @var Event */
         $event  = $eventRepository->findOneById($id);
 
