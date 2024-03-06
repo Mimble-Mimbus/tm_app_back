@@ -119,19 +119,20 @@ class VolunteerShiftCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud) : Crud
     {
-        $crud
-        ->setSearchFields(null)
-        ->overrideTemplates([
-            'crud/index' => 'bundles/easyadmin/volunteer_plannings/index.html.twig'
-        ]);
-        if ($this->filterVolunteer) {
-            $crud->setPageTitle('index', 'Planning de ' . $this->filterVolunteer);
-        } elseif ($this->filterZone) {
-            $crud->setPageTitle('index', 'Planning des bénévoles pour la zone ' . $this->filterZone);
-        } elseif ($this->filterEvent) {
-            $crud->setPageTitle('index', 'Planning des bénévoles pour ' . $this->filterEvent);
-        } elseif ($this->filterOrganization) {
-            $crud->setPageTitle('index', 'Planning des bénévoles pour les événements de ' . $this->filterOrganization);
+        if ($this->filterVolunteer || $this->filterEvent || $this->filterZone) {
+            $crud
+            ->setSearchFields(null)
+            ->overrideTemplates([
+                'crud/index' => 'bundles/easyadmin/volunteer_plannings/index.html.twig'
+            ]);
+
+            if ($this->filterVolunteer) {
+                $crud->setPageTitle('index', 'Planning de ' . $this->filterVolunteer);
+            } elseif ($this->filterZone) {
+                $crud->setPageTitle('index', 'Planning des bénévoles pour la zone ' . $this->filterZone);
+            } elseif ($this->filterEvent) {
+                $crud->setPageTitle('index', 'Planning des bénévoles pour ' . $this->filterEvent);
+            }
         }
         return $crud;
     }
@@ -150,9 +151,6 @@ class VolunteerShiftCrudController extends AbstractCrudController
             } elseif ($this->filterEvent) {
                 $filter = 'event';
                 $filter_id = $this->filterEvent->getId();
-            } elseif ($this->filterOrganization) {
-                $filter = 'organization';  
-                $filter_id = $this->filterOrganization->getId();  
             }
             $responseParameters->set('calendar_filter', $filter);
             $responseParameters->set('calendar_filter_id', $filter_id);
