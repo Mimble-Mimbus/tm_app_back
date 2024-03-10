@@ -299,15 +299,23 @@ class AppFixtures extends Fixture
 
         EntertainmentReservationFactory::createMany(80, function () {
             $registeredUser = rand(0, 1);
-
+            $duo = [];
             if ($registeredUser == 1) {
                 $user =  UserTMFactory::random();
+                $entertainmentSchedule = EntertainmentScheduleFactory::random();
+
+                while (in_array($user->getId().$entertainmentSchedule->getId(), $duo)) {
+                  $user =  UserTMFactory::random();
+                  $entertainmentSchedule = EntertainmentScheduleFactory::random();
+                }
+
+                $duo[] = [$user->getId().$entertainmentSchedule->getId()];
                 return [
                     'user' => $user,
                     'email' => $user->getEmail(),
                     'name' => $user->getName(),
                     'phoneNumber' => $user->getTelephone(),
-                    'entertainmentSchedule' => EntertainmentScheduleFactory::random()
+                    'entertainmentSchedule' => $entertainmentSchedule
                 ];
             } else {
                 return [

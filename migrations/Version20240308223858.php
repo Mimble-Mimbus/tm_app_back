@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20231228001356 extends AbstractMigration
+final class Version20240308223858 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -35,11 +35,11 @@ final class Version20231228001356 extends AbstractMigration
         $this->addSql('CREATE TABLE rpg (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT NOT NULL, publisher VARCHAR(255) NOT NULL, universe VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE rpg_tag (rpg_id INT NOT NULL, tag_id INT NOT NULL, INDEX IDX_A90DC985310B3E3E (rpg_id), INDEX IDX_A90DC985BAD26311 (tag_id), PRIMARY KEY(rpg_id, tag_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE rpg_trigger_warning (rpg_id INT NOT NULL, trigger_warning_id INT NOT NULL, INDEX IDX_9903E6E3310B3E3E (rpg_id), INDEX IDX_9903E6E3ADD48F4F (trigger_warning_id), PRIMARY KEY(rpg_id, trigger_warning_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE rpg_activity (id INT AUTO_INCREMENT NOT NULL, rpg_zone_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT NOT NULL, max_number_seats INT DEFAULT NULL, duration INT DEFAULT NULL, on_reservation TINYINT(1) NOT NULL, is_canceled TINYINT(1) NOT NULL, INDEX IDX_1A00CC6A8DC43294 (rpg_zone_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE rpg_activity (id INT AUTO_INCREMENT NOT NULL, rpg_zone_id INT DEFAULT NULL, user_gm_id INT NOT NULL, rpg_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT NOT NULL, max_number_seats INT DEFAULT NULL, duration INT DEFAULT NULL, on_reservation TINYINT(1) NOT NULL, is_canceled TINYINT(1) NOT NULL, INDEX IDX_1A00CC6A8DC43294 (rpg_zone_id), INDEX IDX_1A00CC6A5FBE94E4 (user_gm_id), INDEX IDX_1A00CC6A310B3E3E (rpg_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE rpg_activity_tag (rpg_activity_id INT NOT NULL, tag_id INT NOT NULL, INDEX IDX_7FAE2F40444E139E (rpg_activity_id), INDEX IDX_7FAE2F40BAD26311 (tag_id), PRIMARY KEY(rpg_activity_id, tag_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE rpg_activity_trigger_warning (rpg_activity_id INT NOT NULL, trigger_warning_id INT NOT NULL, INDEX IDX_BBF6A966444E139E (rpg_activity_id), INDEX IDX_BBF6A966ADD48F4F (trigger_warning_id), PRIMARY KEY(rpg_activity_id, trigger_warning_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE rpg_reservation (id INT AUTO_INCREMENT NOT NULL, rpg_table_id INT NOT NULL, user_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, phone_number VARCHAR(255) NOT NULL, bookings INT NOT NULL, INDEX IDX_87463A5D5A8BED6C (rpg_table_id), INDEX IDX_87463A5DA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE rpg_table (id INT AUTO_INCREMENT NOT NULL, rpg_activity_id INT NOT NULL, user_gm_id INT NOT NULL, rpg_id INT DEFAULT NULL, duration INT DEFAULT NULL, start DATETIME NOT NULL, is_canceled TINYINT(1) NOT NULL, INDEX IDX_17CEDE7F444E139E (rpg_activity_id), INDEX IDX_17CEDE7F5FBE94E4 (user_gm_id), INDEX IDX_17CEDE7F310B3E3E (rpg_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE rpg_table_tag (rpg_table_id INT NOT NULL, tag_id INT NOT NULL, INDEX IDX_2C03798E5A8BED6C (rpg_table_id), INDEX IDX_2C03798EBAD26311 (tag_id), PRIMARY KEY(rpg_table_id, tag_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE rpg_table_trigger_warning (rpg_table_id INT NOT NULL, trigger_warning_id INT NOT NULL, INDEX IDX_851149DD5A8BED6C (rpg_table_id), INDEX IDX_851149DDADD48F4F (trigger_warning_id), PRIMARY KEY(rpg_table_id, trigger_warning_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE rpg_table (id INT AUTO_INCREMENT NOT NULL, rpg_activity_id INT NOT NULL, duration INT DEFAULT NULL, start DATETIME NOT NULL, is_canceled TINYINT(1) NOT NULL, INDEX IDX_17CEDE7F444E139E (rpg_activity_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE rpg_zone (id INT AUTO_INCREMENT NOT NULL, event_id INT NOT NULL, zone_id INT NOT NULL, name VARCHAR(255) NOT NULL, available_tables INT NOT NULL, min_start_hour VARCHAR(255) NOT NULL, max_end_hour VARCHAR(255) NOT NULL, max_available_seats_per_table INT NOT NULL, INDEX IDX_4922E14C71F7E88B (event_id), UNIQUE INDEX UNIQ_4922E14C9F2C3FAB (zone_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE started_quest (id INT AUTO_INCREMENT NOT NULL, quest_id INT NOT NULL, user_id INT NOT NULL, user_guild_id INT DEFAULT NULL, date DATE NOT NULL, is_fulfilled TINYINT(1) NOT NULL, is_aborted TINYINT(1) NOT NULL, difficulty INT DEFAULT NULL, comment LONGTEXT DEFAULT NULL, INDEX IDX_7EB011C6209E9EF4 (quest_id), INDEX IDX_7EB011C6A76ED395 (user_id), INDEX IDX_7EB011C6BFACD5EF (user_guild_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE tag (id INT AUTO_INCREMENT NOT NULL, tag VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -74,15 +74,15 @@ final class Version20231228001356 extends AbstractMigration
         $this->addSql('ALTER TABLE rpg_trigger_warning ADD CONSTRAINT FK_9903E6E3310B3E3E FOREIGN KEY (rpg_id) REFERENCES rpg (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rpg_trigger_warning ADD CONSTRAINT FK_9903E6E3ADD48F4F FOREIGN KEY (trigger_warning_id) REFERENCES trigger_warning (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rpg_activity ADD CONSTRAINT FK_1A00CC6A8DC43294 FOREIGN KEY (rpg_zone_id) REFERENCES rpg_zone (id)');
+        $this->addSql('ALTER TABLE rpg_activity ADD CONSTRAINT FK_1A00CC6A5FBE94E4 FOREIGN KEY (user_gm_id) REFERENCES user_tm (id)');
+        $this->addSql('ALTER TABLE rpg_activity ADD CONSTRAINT FK_1A00CC6A310B3E3E FOREIGN KEY (rpg_id) REFERENCES rpg (id)');
+        $this->addSql('ALTER TABLE rpg_activity_tag ADD CONSTRAINT FK_7FAE2F40444E139E FOREIGN KEY (rpg_activity_id) REFERENCES rpg_activity (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE rpg_activity_tag ADD CONSTRAINT FK_7FAE2F40BAD26311 FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE rpg_activity_trigger_warning ADD CONSTRAINT FK_BBF6A966444E139E FOREIGN KEY (rpg_activity_id) REFERENCES rpg_activity (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE rpg_activity_trigger_warning ADD CONSTRAINT FK_BBF6A966ADD48F4F FOREIGN KEY (trigger_warning_id) REFERENCES trigger_warning (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rpg_reservation ADD CONSTRAINT FK_87463A5D5A8BED6C FOREIGN KEY (rpg_table_id) REFERENCES rpg_table (id)');
         $this->addSql('ALTER TABLE rpg_reservation ADD CONSTRAINT FK_87463A5DA76ED395 FOREIGN KEY (user_id) REFERENCES user_tm (id)');
         $this->addSql('ALTER TABLE rpg_table ADD CONSTRAINT FK_17CEDE7F444E139E FOREIGN KEY (rpg_activity_id) REFERENCES rpg_activity (id)');
-        $this->addSql('ALTER TABLE rpg_table ADD CONSTRAINT FK_17CEDE7F5FBE94E4 FOREIGN KEY (user_gm_id) REFERENCES user_tm (id)');
-        $this->addSql('ALTER TABLE rpg_table ADD CONSTRAINT FK_17CEDE7F310B3E3E FOREIGN KEY (rpg_id) REFERENCES rpg (id)');
-        $this->addSql('ALTER TABLE rpg_table_tag ADD CONSTRAINT FK_2C03798E5A8BED6C FOREIGN KEY (rpg_table_id) REFERENCES rpg_table (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE rpg_table_tag ADD CONSTRAINT FK_2C03798EBAD26311 FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE rpg_table_trigger_warning ADD CONSTRAINT FK_851149DD5A8BED6C FOREIGN KEY (rpg_table_id) REFERENCES rpg_table (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE rpg_table_trigger_warning ADD CONSTRAINT FK_851149DDADD48F4F FOREIGN KEY (trigger_warning_id) REFERENCES trigger_warning (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rpg_zone ADD CONSTRAINT FK_4922E14C71F7E88B FOREIGN KEY (event_id) REFERENCES event (id)');
         $this->addSql('ALTER TABLE rpg_zone ADD CONSTRAINT FK_4922E14C9F2C3FAB FOREIGN KEY (zone_id) REFERENCES zone (id)');
         $this->addSql('ALTER TABLE started_quest ADD CONSTRAINT FK_7EB011C6209E9EF4 FOREIGN KEY (quest_id) REFERENCES quest (id)');
@@ -124,15 +124,15 @@ final class Version20231228001356 extends AbstractMigration
         $this->addSql('ALTER TABLE rpg_trigger_warning DROP FOREIGN KEY FK_9903E6E3310B3E3E');
         $this->addSql('ALTER TABLE rpg_trigger_warning DROP FOREIGN KEY FK_9903E6E3ADD48F4F');
         $this->addSql('ALTER TABLE rpg_activity DROP FOREIGN KEY FK_1A00CC6A8DC43294');
+        $this->addSql('ALTER TABLE rpg_activity DROP FOREIGN KEY FK_1A00CC6A5FBE94E4');
+        $this->addSql('ALTER TABLE rpg_activity DROP FOREIGN KEY FK_1A00CC6A310B3E3E');
+        $this->addSql('ALTER TABLE rpg_activity_tag DROP FOREIGN KEY FK_7FAE2F40444E139E');
+        $this->addSql('ALTER TABLE rpg_activity_tag DROP FOREIGN KEY FK_7FAE2F40BAD26311');
+        $this->addSql('ALTER TABLE rpg_activity_trigger_warning DROP FOREIGN KEY FK_BBF6A966444E139E');
+        $this->addSql('ALTER TABLE rpg_activity_trigger_warning DROP FOREIGN KEY FK_BBF6A966ADD48F4F');
         $this->addSql('ALTER TABLE rpg_reservation DROP FOREIGN KEY FK_87463A5D5A8BED6C');
         $this->addSql('ALTER TABLE rpg_reservation DROP FOREIGN KEY FK_87463A5DA76ED395');
         $this->addSql('ALTER TABLE rpg_table DROP FOREIGN KEY FK_17CEDE7F444E139E');
-        $this->addSql('ALTER TABLE rpg_table DROP FOREIGN KEY FK_17CEDE7F5FBE94E4');
-        $this->addSql('ALTER TABLE rpg_table DROP FOREIGN KEY FK_17CEDE7F310B3E3E');
-        $this->addSql('ALTER TABLE rpg_table_tag DROP FOREIGN KEY FK_2C03798E5A8BED6C');
-        $this->addSql('ALTER TABLE rpg_table_tag DROP FOREIGN KEY FK_2C03798EBAD26311');
-        $this->addSql('ALTER TABLE rpg_table_trigger_warning DROP FOREIGN KEY FK_851149DD5A8BED6C');
-        $this->addSql('ALTER TABLE rpg_table_trigger_warning DROP FOREIGN KEY FK_851149DDADD48F4F');
         $this->addSql('ALTER TABLE rpg_zone DROP FOREIGN KEY FK_4922E14C71F7E88B');
         $this->addSql('ALTER TABLE rpg_zone DROP FOREIGN KEY FK_4922E14C9F2C3FAB');
         $this->addSql('ALTER TABLE started_quest DROP FOREIGN KEY FK_7EB011C6209E9EF4');
@@ -163,10 +163,10 @@ final class Version20231228001356 extends AbstractMigration
         $this->addSql('DROP TABLE rpg_tag');
         $this->addSql('DROP TABLE rpg_trigger_warning');
         $this->addSql('DROP TABLE rpg_activity');
+        $this->addSql('DROP TABLE rpg_activity_tag');
+        $this->addSql('DROP TABLE rpg_activity_trigger_warning');
         $this->addSql('DROP TABLE rpg_reservation');
         $this->addSql('DROP TABLE rpg_table');
-        $this->addSql('DROP TABLE rpg_table_tag');
-        $this->addSql('DROP TABLE rpg_table_trigger_warning');
         $this->addSql('DROP TABLE rpg_zone');
         $this->addSql('DROP TABLE started_quest');
         $this->addSql('DROP TABLE tag');

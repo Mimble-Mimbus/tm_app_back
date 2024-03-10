@@ -6,11 +6,8 @@ use App\Entity\Event;
 use App\Entity\Entertainment;
 use App\Entity\EntertainmentReservation;
 use App\Entity\EntertainmentSchedule;
-use App\Repository\EntertainmentRepository;
-use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,15 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class AnimationController extends AbstractController
 {   
     #[Route('/event/{id}/rpg_activities', name: '/rpg_activities')]
-    public function getRpgActivity (EventRepository $eventRepository, int $id) 
+    public function getRpgActivity (Event $event) 
     {
-        /** @var Event */
-        $event  = $eventRepository->findOneById($id);
-
-        if(!$event) {
-            return new JsonResponse(['error' => "event deosn't existe"], 404);
-        }
-
         $rpgActivities = [];
 
         foreach($event->getRpgZones() as $zone) {
@@ -58,15 +48,8 @@ class AnimationController extends AbstractController
     }
 
     #[Route('/event/{id}/entertainements', name: '/entertainements')]
-    public function getAnimations (EventRepository $eventRepository, int $id) 
+    public function getAnimations (Event $event) 
     {
-        /** @var Event */
-        $event  = $eventRepository->findOneById($id);
-
-        if (!$event) {
-            return new JsonResponse(['error' => "event deosn't existe"], 404);
-        }
-
         $entertainments = [];
 
         foreach($event->getZones() as $zone) {
@@ -99,15 +82,8 @@ class AnimationController extends AbstractController
     }
 
     #[Route('/entertainement/{id}', name: '/entertainement')]
-    public function getAnimation (EntertainmentRepository $entertainmentRepository ,int $id)
+    public function getAnimation (Entertainment $entertainment)
     {   
-        /** @var Entertainment */
-        $entertainment = $entertainmentRepository->findOneById($id);
-
-        if (!$entertainment) {
-            return new JsonResponse(['error' => "entertainment deosn't existe"], 404);
-        }
-        
         $type = $entertainment->getEntertainmentType();
         $schedules = [];
 
@@ -152,6 +128,6 @@ class AnimationController extends AbstractController
         $em->persist($entertainmentSchedule);
         $em->flush();
 
-        return $this->json([], 200, [], ["groups" => "main"]);
+        return $this->json([ 'id' => $entertainmentReservation->getId()], 200, [], ["groups" => "main"]);
     }
 }
