@@ -3,24 +3,15 @@
 namespace App\Controller\Api;
 
 use App\Entity\Event;
-use App\Repository\EventRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/apirest', name: 'api_')]
 class EventController extends AbstractController
 {
     #[Route('/get_event_informations/{id}', name: 'get_event_informations')]
-    public function getEventInformations (EventRepository $eventRepository, int $id) 
+    public function getEventInformations (Event $event) 
     {
-        /** @var Event */
-        $event  = $eventRepository->findOneById($id);
-
-        if(!$event) {
-            return new JsonResponse(['error' => "event deosn't existe"], 404);
-        }
-
         $openDays = [];
         $paymentables = [];
         $transits = [];
