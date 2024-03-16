@@ -1,0 +1,15 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+
+{% block main %}
+
+	<div class="container">
+		<div data-controller="fullcalendar">
+        {{ include('bundles/easyadmin/volunteer_plannings/_filtres.html.twig') }}
+		</div>
+	</div>
+
+
+	<div class="mt-4" id="calendar"></div>
+
+</div></div>{% endblock %}

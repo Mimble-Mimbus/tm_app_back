@@ -179,7 +179,7 @@ class AppFixtures extends Fixture
             ];
         });
 
-        $volunteers = UserTMFactory::createMany(10, function () {
+        $volunteers = UserTMFactory::createMany(40, function () {
             return [
                 'roles' => ['ROLE_USER', 'ROLE_VOLUNTEER'],
                 'guild' => null
@@ -195,7 +195,7 @@ class AppFixtures extends Fixture
             ];
         });
 
-        VolunteerShiftFactory::createMany(25, function () use ($volunteers) {
+        VolunteerShiftFactory::createMany(100, function () use ($volunteers) {
             $event = EventFactory::random();
             $open = $event->getOpenDays()[rand(0, 2)];
 

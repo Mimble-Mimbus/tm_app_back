@@ -21,6 +21,14 @@ class UserTMRepository extends ServiceEntityRepository
         parent::__construct($registry, UserTM::class);
     }
 
+    public function getVolunteers() {
+        return $this->createQueryBuilder('u')
+        ->andWhere('u.roles LIKE :role')
+        ->setParameter('role', '%ROLE_VOLUNTEER%')
+        ->getQuery()
+        ->getResult();
+    }
+
 //    /**
 //     * @return UserTM[] Returns an array of UserTM objects
 //     */

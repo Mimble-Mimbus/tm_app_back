@@ -1,0 +1,57 @@
+<div class="row" id="planning_filters">
+    <div class="col">
+        <select class="form-select text-dark" data-fullcalendar-target="event" data-action="fullcalendar#calendar">
+
+            <option value="" 
+            {% if event_filter is not defined %}
+                 selected 
+            {% endif %}
+            >Filtrer par événement</option>
+
+            {% for event in events %}
+                <option value="{{ event.id }}" 
+                {% if event_filter is defined and event_filter == event.id %}
+                    selected
+                {% endif %}
+                >{{ event.name }}</option>
+            {% endfor %}
+
+        </select>
+    </div>
+    <div class="col">
+        <select class="form-select text-dark" data-fullcalendar-target="zone"  data-action="fullcalendar#calendar">
+            
+            <option value="" 
+            {% if zone_filter is not defined %}
+                selected
+            {% endif %}
+            >Filtrer par zone</option>
+
+            {% for zone in zones %}
+                <option value="{{ zone.id }}" 
+                {% if zone_filter is defined and zone_filter == zone.id %}
+                    selected
+                {% endif %}
+                >{{ zone.name }}</option>
+            {% endfor %}
+
+        </select>
+    </div>
+    <div class="col">
+        <select class="form-select text-dark" data-fullcalendar-target="volunteer"  data-action="fullcalendar#calendar">
+            <option value="" 
+            {% if volunteer_filter is not defined %}
+                selected
+            {% endif %}
+            >Filtrer par bénévole</option>
+
+            {% for volunteer in volunteers %}
+                <option value="{{ volunteer.id }}" 
+                {% if (volunteer_filter is defined and volunteer_filter == volunteer.id) or (app.request.query.get('volunteer') != null and app.request.query.get('volunteer') == volunteer.id) %}
+                    selected
+                {% endif %}
+                >{{ volunteer.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
