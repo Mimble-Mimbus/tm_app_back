@@ -13,6 +13,8 @@ use App\Repository\ZoneRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -23,6 +25,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityRepository;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -39,7 +42,8 @@ class VolunteerShiftCrudController extends AbstractCrudController
         private EventRepository $eventRepository,
         private ZoneRepository $zoneRepository,
         private UserTMRepository $userTMRepository,
-        private OrganizationRepository $organizationRepository
+        private OrganizationRepository $organizationRepository,
+        private AdminUrlGenerator $adminUrlGenerator
     ){
         if ($this->requestStack->getSession()->get('filterByElement')) {
             $element = $this->requestStack->getSession()->get('filterByElement');
@@ -119,46 +123,50 @@ class VolunteerShiftCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud) : Crud
     {
-        if ($this->filterVolunteer || $this->filterEvent || $this->filterZone) {
             $crud
             ->setSearchFields(null)
             ->overrideTemplates([
                 'crud/index' => 'bundles/easyadmin/volunteer_plannings/index.html.twig'
             ]);
-
-            if ($this->filterVolunteer) {
-                $crud->setPageTitle('index', 'Planning de ' . $this->filterVolunteer);
-            } elseif ($this->filterZone) {
-                $crud->setPageTitle('index', 'Planning des bénévoles pour la zone ' . $this->filterZone);
-            } elseif ($this->filterEvent) {
-                $crud->setPageTitle('index', 'Planning des bénévoles pour ' . $this->filterEvent);
-            }
-        }
+        
         return $crud;
     }
 
     public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
     {
+        $events = $this->eventRepository->findAll();
+        $zones = $this->zoneRepository->findAll();
+        $volunteers = $this->userTMRepository->getVolunteers();
+
         if (Crud::PAGE_INDEX === $responseParameters->get('pageName')) {
-            $filter = null;
-            $filter_id = null;
-            if ($this->filterVolunteer) {
-                $filter = 'volunteer';
-                $filter_id = $this->filterVolunteer->getId();
-            } elseif ($this->filterZone) {
-                $filter = 'zone';
-                $filter_id = $this->filterZone->getId();
-            } elseif ($this->filterEvent) {
-                $filter = 'event';
-                $filter_id = $this->filterEvent->getId();
-            }
-            $responseParameters->set('calendar_filter', $filter);
-            $responseParameters->set('calendar_filter_id', $filter_id);
+
+            $responseParameters->set('events', $events);
+            $responseParameters->set('zones', $zones);
+            $responseParameters->set('volunteers', $volunteers);
 
         }
 
         return $responseParameters;
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        $displayVonlunteerCalendar = Action::new('displayVonlunteerCalendar', 'Voir le planning de ce bénévole')
+        ->linkToUrl(
+            function (VolunteerShift $volunteerShift) {
+                return $this->adminUrlGenerator
+                    ->setController(VolunteerShiftCrudController::class)
+                    ->setAction('index')
+                    ->set('volunteer', $volunteerShift->getUser()->getId())
+                    ->unset('entityId')
+                    ->generateUrl();
+            }
+        );
+
+        return $actions
+        ->add(Crud::PAGE_INDEX, $displayVonlunteerCalendar)
+        ->add(Crud::PAGE_DETAIL, $displayVonlunteerCalendar);
+
+    }
     
 }

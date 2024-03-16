@@ -2,5 +2,14 @@
 
 
 {% block main %}
-    <div data-controller="fullcalendar" data-fullcalendar-filter-value="{{ calendar_filter }}" data-fullcalendar-id-value="{{ calendar_filter_id }}"></div>
-{% endblock %}
+
+	<div class="container">
+		<div data-controller="fullcalendar">
+        {{ include('bundles/easyadmin/volunteer_plannings/_filtres.html.twig') }}
+		</div>
+	</div>
+
+
+	<div class="mt-4" id="calendar"></div>
+
+</div></div>{% endblock %}
