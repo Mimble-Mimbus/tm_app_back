@@ -55,7 +55,7 @@ class Tag
         return $this->rpgActivities;
     }
 
-    public function addRpgTable(RpgActivity $rpgActivity): static
+    public function addRpgActivity(RpgActivity $rpgActivity): static
     {
         if (!$this->rpgActivities->contains($rpgActivity)) {
             $this->rpgActivities->add($rpgActivity);
@@ -65,7 +65,7 @@ class Tag
         return $this;
     }
 
-    public function removeRpgTable(RpgActivity $rpgActivity): static
+    public function removeRpgActivity(RpgActivity $rpgActivity): static
     {
         if ($this->rpgActivities->removeElement($rpgActivity)) {
             $rpgActivity->removeTag($this);

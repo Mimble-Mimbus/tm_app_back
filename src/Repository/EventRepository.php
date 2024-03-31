@@ -22,14 +22,14 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
-    public function findNextEvent(): array
+    public function findNextEvent(): Event
     {
         return $this->createQueryBuilder('e')
         ->join(OpenDay::class, 'o', 'WITH', 'o.event = e.id')
         ->orderBy('o.dayStart', 'DESC')
         ->setMaxResults(1)
         ->getQuery()
-        ->getResult()
+        ->getResult()[0]
         ;
     }
 

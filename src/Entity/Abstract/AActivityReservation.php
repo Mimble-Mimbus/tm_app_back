@@ -5,7 +5,9 @@ namespace App\Entity\Abstract;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\ReservationConstraint;
 
+#[ReservationConstraint]
 #[MappedSuperclass]
 abstract class AActivityReservation
 {
@@ -17,7 +19,7 @@ abstract class AActivityReservation
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
-    #[Assert\Regex(pattern: "/^\+31\(0\)[0-9]*$/", message: "invalide phone number {{ value }}")]
+    #[Assert\Regex(pattern: "/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/", message: "invalide phone number {{ value }}")]
     #[ORM\Column(length: 255)]
     private ?string $phoneNumber = null;
 

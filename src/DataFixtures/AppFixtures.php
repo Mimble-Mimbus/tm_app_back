@@ -3,6 +3,8 @@
 namespace App\DataFixtures;
 
 use App\Controller\Admin\GuildCrudController;
+use App\Entity\RpgActivity;
+use App\Entity\Entertainment;
 use App\Factory\EntertainmentFactory;
 use App\Factory\EntertainmentReservationFactory;
 use App\Factory\EntertainmentScheduleFactory;
@@ -26,18 +28,35 @@ use App\Factory\TransitFactory;
 use App\Factory\TriggerWarningFactory;
 use App\Factory\TypePaymentableFactory;
 use App\Factory\UrlFactory;
-use App\Factory\UserParamsFactory;
 use App\Factory\UserTMFactory;
 use App\Factory\VolunteerShiftFactory;
 use App\Factory\ZoneFactory;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Validator\Constraints\Length;
 use function Zenstruck\Foundry\faker;
 
 class AppFixtures extends Fixture
-{
+{ 
+    public function getGoodDate (RpgActivity | Entertainment $activity): mixed
+    {
+        if ($activity instanceof RpgActivity) {
+            $zone = $activity->getRpgZone();
+        } else {
+            $zone = $activity->getZone();
+        }
+
+        $openDays = $zone->getEvent()->getOpenDays();
+        $dates = [];
+        foreach ($openDays as $openDay) {
+            $date = $openDay->getDayStart();
+            date_time_set($date, mt_rand(8, 23), mt_rand(0, 59));
+            $dates[] = $date;
+        }
+
+        return $dates[array_rand($dates)];
+      }
+
     public function load(ObjectManager $manager): void
     {
         UserTMFactory::createOne([
@@ -256,10 +275,12 @@ class AppFixtures extends Fixture
         }
 
         RpgTableFactory::createMany(8, function () {
+            $rpgActivity = RpgActivityFactory::random();
+            $date = $this->getGoodDate($rpgActivity->object());
             return [
-                'rpgActivity' => RpgActivityFactory::random(),
-                'isCanceled' => rand(0, 1)
-
+                'rpgActivity' => $rpgActivity,
+                'isCanceled' => rand(0, 1),
+                'start' => $date
             ];
         });
 
@@ -292,8 +313,12 @@ class AppFixtures extends Fixture
         });
 
         EntertainmentScheduleFactory::createMany(30, function () {
+            $entairtenment = EntertainmentFactory::random();
+            $date = $this->getGoodDate($entairtenment->object());
+
             return [
-                'entertainment' => EntertainmentFactory::random()
+                'entertainment' => EntertainmentFactory::random(),
+                'start' => $date
             ];
         });
 

@@ -78,9 +78,22 @@ class RpgTable extends AActivitySchedule
         }
 
         return $this;
-    }   
+    }
+    
+    public function getAvailableSeats () 
+    {
+        $max = $this->getRpgActivity()->getMaxNumberSeats();
+        $count = 0;
 
-    public function __toString() {
+        foreach ($this->getActivityReservations() as $reservation) {
+            $count += $reservation->getBookings();
+        }
+
+        return ($max - $count);
+    }
+
+    public function __toString() 
+    {
         return date_format($this->getStart(), 'd/m/Y H:i');
     }
 }

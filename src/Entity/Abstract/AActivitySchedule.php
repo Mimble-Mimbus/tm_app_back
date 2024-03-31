@@ -64,5 +64,4 @@ abstract class AActivitySchedule
     abstract public function addActivityReservation($activityReservation): static;
 
     abstract public function removeActivityReservation($activityReservation): static;
-
 }

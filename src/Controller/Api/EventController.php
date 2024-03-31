@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Event;
+use App\Repository\EventRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -19,6 +20,7 @@ class EventController extends AbstractController
 
         foreach ($event->getOpenDays() as $openDay) {
             $openDays[] = [
+                'id' => $openDay->getId(),
                 'dayStart' => $openDay->getDayStart(),
                 'dayEnd' => $openDay->getDayEnd(),
             ];
@@ -26,11 +28,11 @@ class EventController extends AbstractController
 
         foreach ($event->getTransits() as $transit) {
             $transits[] = [
-              'name' => $transit->getName(),
-              'address' => $transit->getAddress(),
-              'start' => $transit->getStart(),
-              'arrival' => $transit->getArrival(),
-              'availableSeats' => $transit->getAvailableSeats(),
+                'name' => $transit->getName(),
+                'address' => $transit->getAddress(),
+                'start' => $transit->getStart(),
+                'arrival' => $transit->getArrival(),
+                'availableSeats' => $transit->getAvailableSeats(),
             ];
         }
 
@@ -51,9 +53,9 @@ class EventController extends AbstractController
             }
 
             $paymentables[] = [
-              'type' => $type,
-              'priceDetails' => $prices,
-              'name' => $paymentable->getName()
+                'type' => $type,
+                'priceDetails' => $prices,
+                'name' => $paymentable->getName()
             ];
         }
 
@@ -65,6 +67,22 @@ class EventController extends AbstractController
             'address' => $event->getAddress()
         ];
 
+        return $this->json($response, 200, [], ["groups" => "main"]);
+    }
+
+    #[Route('/random_event', name: 'random_event')]
+    public function getEvent (EventRepository $eventRepository)
+    {
+
+        $event = $eventRepository->findNextEvent();
+        $rpgZone = $event->getRpgZones()[0];
+
+        $response = [
+            'id' => $event->getId(),
+            'rpgZone' => [
+                'id' => $rpgZone->getId(),
+            ]
+        ];
         return $this->json($response, 200, [], ["groups" => "main"]);
     }
 }
