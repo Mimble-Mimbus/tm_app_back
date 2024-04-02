@@ -162,4 +162,33 @@ class UserTM extends AUser
 
         return $this;
     }
+
+    public function getReservationsList() : Array
+    {
+        $liste = [];
+        foreach ($this->getEntertainmentReservations() as $reservation) {
+            $liste[] = date_format($reservation->getActivitySchedule()->getStart(), 'd-m-Y H:i') . ' - ' . $reservation->getActivitySchedule()->getEntertainment()->getName();
+        }
+        return $liste;
+    }
+
+    public function getRpgReservationsList() : Array
+    {
+        $liste = [];
+        foreach ($this->getRpgReservations() as $reservation) {
+            $liste[] = date_format($reservation->getActivitySchedule()->getStart(), 'd-m-Y H:i') . ' - ' . $reservation->getActivitySchedule()->getRpgActivity()->getName();
+        }
+        return $liste;
+    }
+
+    public function getRpgActivitiesList() : Array
+    {
+        $liste = [];
+        foreach ($this->getRpgActivities() as $reservation) {
+            foreach ($reservation->getActivitySchedules() as $schedule) {
+                $liste[] = date_format($schedule->getStart(), 'd-m-Y H:i') . ' - ' . $reservation->getName() . ' ('. $reservation->getRpg()->getName().')';
+            }
+        }
+        return $liste;
+    }
 }
