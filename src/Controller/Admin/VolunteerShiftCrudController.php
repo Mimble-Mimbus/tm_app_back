@@ -36,6 +36,7 @@ class VolunteerShiftCrudController extends AbstractCrudController
     private $filterOrganization = null;
     private $filterZone = null;
     private $filterVolunteer = null;
+    private $calendar_view = false;
 
     public function __construct(
         private RequestStack $requestStack,
@@ -72,6 +73,10 @@ class VolunteerShiftCrudController extends AbstractCrudController
 
         if ($this->requestStack->getMainRequest()->query->get('volunteer')) {
             $this->filterVolunteer = $this->userTMRepository->find($this->requestStack->getMainRequest()->query->get('volunteer'));
+        }
+
+        if ($this->requestStack->getMainRequest()->query->get('view') && $this->requestStack->getMainRequest()->query->get('view') == 'calendar') {
+            $this->calendar_view = true;
         }
     }
 
@@ -111,23 +116,57 @@ class VolunteerShiftCrudController extends AbstractCrudController
     
     public function configureFields(string $pageName): iterable
     {
+        $eventField = AssociationField::new('event', 'Evénement');
+        $zoneField = AssociationField::new('zone');
+
+        if ($this->filterOrganization) {
+            $eventField = AssociationField::new('event', 'Evénement')->setQueryBuilder(function ($queryBuilder) {
+                $queryBuilder
+                    ->andWhere('e.organization = :org')
+                    ->setParameter('org', $this->filterOrganization);
+            });
+
+            $zoneField = AssociationField::new('zone')->setQueryBuilder(function ($queryBuilder) {
+                $queryBuilder
+                    ->join(Event::class, 'e', 'WITH', 'e.id = entity.event')
+                    ->andWhere('e.organization = :org')
+                    ->setParameter('org', $this->filterOrganization);
+            });
+        }
+        if( $this->filterEvent != null) {
+            $eventField = AssociationField::new('event', 'Evènement')->setEmptyData($this->filterEvent)->setDisabled();
+
+            $zoneField = AssociationField::new('zone')->setQueryBuilder(function ($queryBuilder) {
+                $queryBuilder
+                    ->andWhere('entity.event = :event')
+                    ->setParameter('event', $this->filterEvent);
+            });
+        }
+
+        if( $this->filterZone != null) {
+            $eventField = AssociationField::new('event', 'Evènement')->setEmptyData($this->filterZone->getEvent())->setDisabled();
+            $eventField = AssociationField::new('zone')->setEmptyData($this->filterZone)->setDisabled();
+        }
+
         return [
-            AssociationField::new('user'),
-            AssociationField::new('event'),
-            AssociationField::new('zone'),
-            DateTimeField::new('shiftStart'),
-            DateTimeField::new('shiftEnd'),
+            AssociationField::new('user', 'Bénévole'),
+            $eventField,
+            $zoneField,
+            DateTimeField::new('shiftStart', 'Prise de poste'),
+            DateTimeField::new('shiftEnd', 'Fin de période'),
             TextEditorField::new('description'),
         ];
     }
 
     public function configureCrud(Crud $crud) : Crud
     {
+        if ($this->calendar_view) {
+
             $crud
-            ->setSearchFields(null)
             ->overrideTemplates([
                 'crud/index' => 'bundles/easyadmin/volunteer_plannings/index.html.twig'
             ]);
+        }
         
         return $crud;
     }
@@ -138,7 +177,7 @@ class VolunteerShiftCrudController extends AbstractCrudController
         $zones = $this->zoneRepository->findAll();
         $volunteers = $this->userTMRepository->getVolunteers();
 
-        if (Crud::PAGE_INDEX === $responseParameters->get('pageName')) {
+        if (Crud::PAGE_INDEX === $responseParameters->get('pageName') && $this->calendar_view) {
 
             $responseParameters->set('events', $events);
             $responseParameters->set('zones', $zones);
@@ -158,13 +197,32 @@ class VolunteerShiftCrudController extends AbstractCrudController
                     ->setController(VolunteerShiftCrudController::class)
                     ->setAction('index')
                     ->set('volunteer', $volunteerShift->getUser()->getId())
+                    ->set('view', 'calendar')
                     ->unset('entityId')
                     ->generateUrl();
             }
         );
 
+        $displayGlobalCalendar = Action::new('displayGlobalCalendar', 'Voir le planning général')
+        ->linkToUrl(
+            function () {
+                return $this->adminUrlGenerator
+                    ->setController(VolunteerShiftCrudController::class)
+                    ->setAction('index')
+                    ->set('view', 'calendar')
+                    ->unset('entityId')
+                    ->generateUrl();
+            }
+        )
+        ->createAsGlobalAction();
+
         return $actions
         ->add(Crud::PAGE_INDEX, $displayVonlunteerCalendar)
+        ->add(Crud::PAGE_INDEX, $displayGlobalCalendar)
+
+        ->update(Crud::PAGE_INDEX, Action::NEW, function(Action $action){
+            return $action->setLabel('Ajouter une période au calendrier');
+        })
         ->add(Crud::PAGE_DETAIL, $displayVonlunteerCalendar);
 
     }

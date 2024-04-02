@@ -140,6 +140,7 @@ class ZoneCrudController extends AbstractCrudController
                 return $this->adminUrlGenerator
                     ->setController(VolunteerShiftCrudController::class)
                     ->setAction('index')
+                    ->set('view', 'calendar')
                     ->set('zone', $zone->getId())
                     ->unset('entityId')
                     ->generateUrl();

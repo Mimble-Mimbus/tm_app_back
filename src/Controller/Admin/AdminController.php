@@ -38,7 +38,6 @@ class AdminController extends AbstractController
         $volunteer_filter = $request->query->get('volunteer') ? $request->query->get('volunteer') : $volunteer_filter;
 
         $filtered_shifts = $volunteerShiftRepository->getShiftsForPlanning($event_filter, $zone_filter, $volunteer_filter);
-        
         $start = null;
         if (count($filtered_shifts) > 0) {
 

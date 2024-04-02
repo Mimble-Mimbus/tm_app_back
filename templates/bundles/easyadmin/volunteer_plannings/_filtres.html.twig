@@ -10,7 +10,7 @@
 
             {% for event in events %}
                 <option value="{{ event.id }}" 
-                {% if event_filter is defined and event_filter == event.id %}
+                {% if (event_filter is defined and event_filter == event.id) or (app.request.query.get('event') != null and app.request.query.get('event') == event.id) %}
                     selected
                 {% endif %}
                 >{{ event.name }}</option>
@@ -29,7 +29,7 @@
 
             {% for zone in zones %}
                 <option value="{{ zone.id }}" 
-                {% if zone_filter is defined and zone_filter == zone.id %}
+                {% if (zone_filter is defined and zone_filter == zone.id) or (app.request.query.get('zone') != null and app.request.query.get('zone') == zone.id) %}
                     selected
                 {% endif %}
                 >{{ zone.name }}</option>
