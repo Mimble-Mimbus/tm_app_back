@@ -204,6 +204,7 @@ class EventCrudController extends AbstractCrudController
                 return $this->adminUrlGenerator
                     ->setController(VolunteerShiftCrudController::class)
                     ->setAction('index')
+                    ->set('view', 'calendar')
                     ->set('event', $event->getId())
                     ->unset('entityId')
                     ->generateUrl();
