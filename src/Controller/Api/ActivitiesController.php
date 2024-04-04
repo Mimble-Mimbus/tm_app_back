@@ -10,6 +10,7 @@ use App\Entity\Rpg;
 use App\Entity\RpgActivity;
 use App\Entity\RpgReservation;
 use App\Entity\RpgTable;
+use App\Entity\RpgZone;
 use App\Entity\Tag;
 use App\Entity\TriggerWarning;
 use App\Repository\RpgRepository;
@@ -62,7 +63,7 @@ class ActivitiesController extends AbstractController
         }
 
         $rpgActivities = [];
-
+        
         foreach($event->getRpgZones() as $zone) {
             foreach($zone->getRpgActivities() as $activity) {
                 $rpgTables = [];
@@ -163,7 +164,7 @@ class ActivitiesController extends AbstractController
         return $this->json([ 'id' => $rpgReservation->getId()], 200, [], ["groups" => "main"]);
     }
 
-    #[Route("/rpg_activity/{id}", name:"/rpg_activity")]
+    #[Route("/rpg_activity/{id}", methods: ['GET'], name:"/rpg_activity")]
     public function getRpgActivity (RpgActivity $rpgActivity)
     {   
         $schedules = [];
@@ -190,8 +191,9 @@ class ActivitiesController extends AbstractController
         return $this->json($response, 200, [], ["groups" => "main"]);
     }
 
-    #[Route("/rpg_activity", methods:'POST', name:'post/rpg_activity')]
+    #[Route("/rpg_activity/{id}", methods:['POST'], name:'post/rpg_activity')]
     public function postRpgActivity (
+        RpgZone $rpgZone,
         Request $request, 
         EntityManagerInterface $em, 
         TagRepository $tagRepository, 
@@ -200,17 +202,19 @@ class ActivitiesController extends AbstractController
         Security $security
     ) {
         $user = $security->getUser();
-
-        if (!$user) {
-            throw new HttpException(401, 'invalid credentials');
-        }
-
         $rpgActivity = new RpgActivity();
         $body = $request->toArray();
 
+        $rpgActivity->setName($body['name']);
+        $rpgActivity->setDuration(intval(substr($body['duration'], 0, 2)));
+        $rpgActivity->setDescription($body['description']);
+        $rpgActivity->setMaxNumberSeats($body['maxNumberSeats']);
+        $rpgActivity->setRpgZone($rpgZone);
+        $rpgActivity->setUserGm($user);
+
         foreach ($body['schedules'] as $schedule) {
             $rpgTable = new RpgTable();
-            $rpgTable->setDuration($body["duration"]);
+            $rpgTable->setDuration(intval(substr($body["duration"], 0, 2)));
             $rpgTable->setStart(new DateTime($schedule['start']));
             $rpgActivity->addActivitySchedule($rpgTable);
             $em->persist($rpgTable);
@@ -230,16 +234,16 @@ class ActivitiesController extends AbstractController
             $em->persist($triggerWarning);
         }
 
-        $rpgData = $body["rpg"];
+        $rpgData = $body["rpgData"];
         if (is_integer($rpgData)) {
             /** @var Rpg */
             $rpg = $rpgRepository->findOneById($rpgData);
-            $rpg->addRpgActivity($rpgActivity);
         } else if (is_array($rpgData)) {
             $rpg = new Rpg();
             $rpg->setName($rpgData['name']);
             $rpg->setUniverse($rpgData['universe']);
             $rpg->setPublisher($rpgData['publisher']);
+            $rpg->setDescription($rpgData['description']);
             
             foreach ($rpgData['tags'] as $tag) {
                 /** @var Tag */
@@ -257,14 +261,27 @@ class ActivitiesController extends AbstractController
         } else {
             throw new HttpException('invalid rpg data');
         }
-
-        $rpgActivity->setRpg($rpg);
-        $rpgActivity->setName($body['name']);
-        $rpgActivity->setDuration($body['duration']);
-        $rpgActivity->setDescription($body['description']);
-        $rpgActivity->setMaxNumberSeats($body['maxNumberSeats']);
+        
+        $rpg->addRpgActivity($rpgActivity);
 
         $em->persist($rpg);
         $em->persist($rpgActivity);
+        $em->flush();
+
+        $schedules = [];
+        foreach ($rpgActivity->getActivitySchedules() as $schedule) {
+            $schedules[] = [
+                'id' => $schedule->getId(),
+                'start' => $schedule->getStart(),
+                'duration' => $schedule->getDuration(),
+                'availableSeats' => $schedule->getAvailableSeats(),
+            ];
+        }
+
+        $response = [
+            'id' => $rpgActivity->getId(),
+            'schedules' => $schedules
+        ];
+        return $this->json($response, 200, [], ['groups' => 'main']);
     }
 }

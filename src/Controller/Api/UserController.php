@@ -10,7 +10,7 @@ use App\Entity\UserTM;
 #[Route('/api/apirest', name: 'api_')]
 class UserController extends AbstractController
 {
-    #[Route("/user", name: "/user")]
+    #[Route("/user/me", name: "/user/me")]
     public function user ()
     {
         /** @var UserTM */

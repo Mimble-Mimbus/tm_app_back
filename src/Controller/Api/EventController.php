@@ -6,17 +6,17 @@ use App\Entity\Event;
 use App\Repository\EventRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/apirest', name: 'api_')]
 class EventController extends AbstractController
-{
+{   
     #[Route('/get_event_informations/{id}', name: 'get_event_informations')]
     public function getEventInformations (Event $event) 
     {
         $openDays = [];
         $paymentables = [];
         $transits = [];
-
 
         foreach ($event->getOpenDays() as $openDay) {
             $openDays[] = [

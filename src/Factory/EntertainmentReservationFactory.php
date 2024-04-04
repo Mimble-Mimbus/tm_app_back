@@ -51,7 +51,7 @@ final class EntertainmentReservationFactory extends ModelFactory
             'email' => self::faker()->unique()->email(),
             //'entertainmentSchedule' => EntertainmentScheduleFactory::new(),
             'name' => self::faker()->text(255),
-            'phoneNumber' => self::faker()->text(255),
+            'phoneNumber' => self::faker()->phoneNumber(),
         ];
     }
 

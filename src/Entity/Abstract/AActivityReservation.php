@@ -19,7 +19,6 @@ abstract class AActivityReservation
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
-    #[Assert\Regex(pattern: "/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/", message: "invalide phone number {{ value }}")]
     #[ORM\Column(length: 255)]
     private ?string $phoneNumber = null;
 

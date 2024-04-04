@@ -8,7 +8,9 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class ReservationConstraint extends Constraint
 {
-    public $message = "reservation with email: {{email}} for animation: {{activity}} already exist";
+    public $emailMessage = "reservation with email: {{email}} for animation: {{activity}} already exist";
+    
+    public $phoneNumberMessage = "invalide phone number {{value}}";
 
     public function getTargets()
     {

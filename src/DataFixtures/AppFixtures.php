@@ -283,24 +283,32 @@ class AppFixtures extends Fixture
                 'start' => $date
             ];
         });
+        
+        $duoRpg = [];
+        RpgReservationFactory::createMany(15, function  () use ($duoRpg) {
+          $registeredUser = rand(0, 1);
+          if ($registeredUser == 1) {
+              $user =  UserTMFactory::random();
+              $rpgTable = RpgTableFactory::random();
 
-        RpgReservationFactory::createMany(15, function () {
-            $registeredUser = rand(0, 1);
-
-            if ($registeredUser == 1) {
+              while (in_array($user->getId().$rpgTable->getId(), $duoRpg)) {
                 $user =  UserTMFactory::random();
-                return [
-                    'user' => $user,
-                    'email' => $user->getEmail(),
-                    'name' => $user->getName(),
-                    'phoneNumber' => $user->getTelephone(),
-                    'rpgTable' => RpgTableFactory::random()
-                ];
-            } else {
-                return [
-                    'rpgTable' => RpgTableFactory::random()
-                ];
-            }
+                $rpgTable = RpgTableFactory::random();
+              }
+
+              $duoRpg[] = [$user->getId().$rpgTable->getId()];
+              return [
+                  'user' => $user,
+                  'email' => $user->getEmail(),
+                  'name' => $user->getName(),
+                  'phoneNumber' => $user->getTelephone(),
+                  'rpgTable' => $rpgTable
+              ];
+          } else {
+              return [
+                  'rpgTable' => RpgTableFactory::random()
+              ];
+          }
         });
 
         EntertainmentTypeFactory::createMany(5);
@@ -322,19 +330,19 @@ class AppFixtures extends Fixture
             ];
         });
 
-        EntertainmentReservationFactory::createMany(80, function () {
+        $duoEntertainement = [];
+        EntertainmentReservationFactory::createMany(80, function () use ($duoEntertainement) {
             $registeredUser = rand(0, 1);
-            $duo = [];
             if ($registeredUser == 1) {
                 $user =  UserTMFactory::random();
                 $entertainmentSchedule = EntertainmentScheduleFactory::random();
 
-                while (in_array($user->getId().$entertainmentSchedule->getId(), $duo)) {
-                  $user =  UserTMFactory::random();
-                  $entertainmentSchedule = EntertainmentScheduleFactory::random();
+                while (in_array($user->getId().$entertainmentSchedule->getId(), $duoEntertainement)) {
+                    $user = UserTMFactory::random();
+                    $entertainmentSchedule = EntertainmentScheduleFactory::random();
                 }
 
-                $duo[] = [$user->getId().$entertainmentSchedule->getId()];
+                $duoEntertainement[] = $user->getId().$entertainmentSchedule->getId();
                 return [
                     'user' => $user,
                     'email' => $user->getEmail(),
