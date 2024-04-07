@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class RpgTableConstraintValidator extends ConstraintValidator
 {
 
-  public function validate(mixed $protocol, Constraint $constraint)
+  public function validate(mixed $protocol, Constraint $constraint): void
   {
       if (!$constraint instanceof RpgTableConstraint) {
           throw new UnexpectedTypeException($constraint, RpgTableConstraint::class);

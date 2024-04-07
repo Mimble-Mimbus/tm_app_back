@@ -6,7 +6,6 @@ use App\Service\ValidatorService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Events;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 
 #[AsDoctrineListener(event: Events::prePersist)]
