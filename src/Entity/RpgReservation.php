@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Entity\Abstract\AActivityReservation;
 use App\Repository\RpgReservationRepository;
 use Doctrine\ORM\Mapping as ORM;
-
 #[ORM\Entity(repositoryClass: RpgReservationRepository::class)]
 class RpgReservation extends AActivityReservation
 {

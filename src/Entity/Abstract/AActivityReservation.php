@@ -2,10 +2,12 @@
 
 namespace App\Entity\Abstract;
 
-use App\Entity\UserTM;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\MappedSuperclass;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\ReservationConstraint;
 
+#[ReservationConstraint]
 #[MappedSuperclass]
 abstract class AActivityReservation
 {
@@ -13,6 +15,7 @@ abstract class AActivityReservation
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Email(message: "The email {{ value }} is not a valid email.")]
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 

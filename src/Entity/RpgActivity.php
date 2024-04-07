@@ -37,6 +37,8 @@ class RpgActivity extends AActivity
 
     public function __construct()
     {
+        parent::__construct();
+        $this->setOnReservation(false);
         $this->rpgTables = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->triggerWarnings = new ArrayCollection();

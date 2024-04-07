@@ -16,9 +16,13 @@ abstract class AActivitySchedule
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $start = null;
 
-    #[ORM\Column]
+    #[ORM\Column(options:['default' => 0])]
     private ?bool $isCanceled = null;
 
+    public function __construct()
+    {
+          $this->isCanceled = false;
+    }
 
     public function getDuration(): ?int
     {
@@ -64,5 +68,4 @@ abstract class AActivitySchedule
     abstract public function addActivityReservation($activityReservation): static;
 
     abstract public function removeActivityReservation($activityReservation): static;
-
 }

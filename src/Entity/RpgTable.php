@@ -4,10 +4,12 @@ namespace App\Entity;
 
 use App\Entity\Abstract\AActivitySchedule;
 use App\Repository\RpgTableRepository;
+use App\Validator\RpgTableConstraint;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+#[RpgTableConstraint]
 #[ORM\Entity(repositoryClass: RpgTableRepository::class)]
 class RpgTable extends AActivitySchedule
 {
@@ -23,10 +25,9 @@ class RpgTable extends AActivitySchedule
     #[ORM\OneToMany(mappedBy: 'rpgTable', targetEntity: RpgReservation::class, cascade: ['remove'])]
     private Collection $rpgReservations;
 
-    
-
     public function __construct()
-    {
+    { 
+        parent::__construct();
         $this->rpgReservations = new ArrayCollection();
         
     }
@@ -78,9 +79,22 @@ class RpgTable extends AActivitySchedule
         }
 
         return $this;
-    }   
+    }
+    
+    public function getAvailableSeats (): int
+    {
+        $max = $this->getRpgActivity()->getMaxNumberSeats();
+        $count = 0;
 
-    public function __toString() {
+        foreach ($this->getActivityReservations() as $reservation) {
+            $count += $reservation->getBookings();
+        }
+
+        return ($max - $count);
+    }
+
+    public function __toString() 
+    {
         return date_format($this->getStart(), 'd/m/Y H:i');
     }
 }

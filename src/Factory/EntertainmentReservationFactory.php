@@ -47,11 +47,11 @@ final class EntertainmentReservationFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'bookings' => self::faker()->randomNumber(),
-            'email' => self::faker()->text(255),
+            'bookings' => self::faker()->numberBetween(1, 6),
+            'email' => self::faker()->unique()->email(),
             //'entertainmentSchedule' => EntertainmentScheduleFactory::new(),
             'name' => self::faker()->text(255),
-            'phoneNumber' => self::faker()->text(255),
+            'phoneNumber' => self::faker()->phoneNumber(),
         ];
     }
 

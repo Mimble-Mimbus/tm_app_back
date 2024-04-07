@@ -5,28 +5,22 @@ namespace App\Controller\Api;
 use App\Entity\Event;
 use App\Repository\EventRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/apirest', name: 'api_')]
 class EventController extends AbstractController
-{
+{   
     #[Route('/get_event_informations/{id}', name: 'get_event_informations')]
-    public function getEventInformations (EventRepository $eventRepository, int $id) {
-        /** @var Event */
-        $event  = $eventRepository->findOneById($id);
-
-        if(!$event) {
-            return new JsonResponse(['error' => "event deosn't existe"], 404);
-        }
-
+    public function getEventInformations (Event $event) 
+    {
         $openDays = [];
         $paymentables = [];
         $transits = [];
 
-
         foreach ($event->getOpenDays() as $openDay) {
             $openDays[] = [
+                'id' => $openDay->getId(),
                 'dayStart' => $openDay->getDayStart(),
                 'dayEnd' => $openDay->getDayEnd(),
             ];
@@ -34,11 +28,11 @@ class EventController extends AbstractController
 
         foreach ($event->getTransits() as $transit) {
             $transits[] = [
-              'name' => $transit->getName(),
-              'address' => $transit->getAddress(),
-              'start' => $transit->getStart(),
-              'arrival' => $transit->getArrival(),
-              'availableSeats' => $transit->getAvailableSeats(),
+                'name' => $transit->getName(),
+                'address' => $transit->getAddress(),
+                'start' => $transit->getStart(),
+                'arrival' => $transit->getArrival(),
+                'availableSeats' => $transit->getAvailableSeats(),
             ];
         }
 
@@ -59,9 +53,9 @@ class EventController extends AbstractController
             }
 
             $paymentables[] = [
-              'type' => $type,
-              'priceDetails' => $prices,
-              'name' => $paymentable->getName()
+                'type' => $type,
+                'priceDetails' => $prices,
+                'name' => $paymentable->getName()
             ];
         }
 
@@ -73,6 +67,22 @@ class EventController extends AbstractController
             'address' => $event->getAddress()
         ];
 
+        return $this->json($response, 200, [], ["groups" => "main"]);
+    }
+
+    #[Route('/random_event', name: 'random_event')]
+    public function getEvent (EventRepository $eventRepository)
+    {
+
+        $event = $eventRepository->findNextEvent();
+        $rpgZone = $event->getRpgZones()[0];
+
+        $response = [
+            'id' => $event->getId(),
+            'rpgZone' => [
+                'id' => $rpgZone->getId(),
+            ]
+        ];
         return $this->json($response, 200, [], ["groups" => "main"]);
     }
 }

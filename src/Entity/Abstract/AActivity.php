@@ -26,8 +26,13 @@ abstract class AActivity
     #[ORM\Column]
     private ?bool $onReservation = null;
 
-    #[ORM\Column]
-    private ?bool $isCanceled = null;
+    #[ORM\Column(options:["default" => 0])]
+    private ?bool $isCanceled = false;
+
+    public function __construct()
+    {
+        $this->isCanceled = false;
+    }
 
     public function getName(): ?string
     {
