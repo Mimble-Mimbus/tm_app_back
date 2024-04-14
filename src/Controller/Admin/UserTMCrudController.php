@@ -56,6 +56,11 @@ class UserTMCrudController extends AbstractCrudController
                 FormField::addTab('Guilde favorite'),
                 TextField::new('guild', 'Guilde')
             ];
+            $instance = $this->getContext()->getEntity()->getInstance();
+            if (in_array('ROLE_VOLUNTEER', $instance->getRoles())) {
+                $fields[] = FormField::addTab('Shifts');
+                $fields[] =CollectionField::new('volunteerShifts', 'Shifts')->setTemplatePath('bundles/easyadmin/fields/user_shifts.html.twig');
+            }
         }
         return $fields;
     }

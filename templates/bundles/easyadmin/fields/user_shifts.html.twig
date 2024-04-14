@@ -1,0 +1,16 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{# this is a bit ugly, but Twig doesn't have a 'is numeric' test #}
+{% if field.value != null%}
+   {% for shift in field.value|sort((a, b) => a.shiftStart <=> b.shiftStart) %}
+        <div>
+            {{ shift.shiftStart|date('d-m-Y H:i') }} - {{ shift.shiftStart|date('d-m-Y H:i') }} <br>
+            Evénement : {{ shift.event }} <br>
+            Zone : {{ shift.zone }} <br>
+            Description : {{ shift.description }} <br>
+
+        </div>
+        <hr>
+   {% endfor %}
+{% endif %}
