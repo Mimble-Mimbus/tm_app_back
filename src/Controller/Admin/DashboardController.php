@@ -59,8 +59,6 @@ class DashboardController extends AbstractDashboardController
             $currentRequest->getSession()->set('filterByElement', $chosenFilter);
         }
 
-
-
         // statistiques
         $users = $this->userTMRepository->count([]);
         $events = $this->eventRepository->findAll();

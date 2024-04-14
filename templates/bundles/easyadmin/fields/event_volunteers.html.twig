@@ -1,0 +1,14 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{# this is a bit ugly, but Twig doesn't have a 'is numeric' test #}
+{% if field.value is not null %}
+    {% for volunteershift in field.value|sort((a, b) => a.shiftStart <=> b.shiftStart) %}
+        <div>
+            <p>{{ volunteershift.shiftStart|date('d-m-Y H:i') }} - {{ volunteershift.shiftEnd|date('d-m-Y H:i') }}</p>
+            <p>Bénévole : {{ volunteershift.user.name }}</p>
+            <p>Zone : {{ volunteershift.zone }}</p>
+        </div>
+        <hr>
+    {% endfor %}
+{% endif %}

@@ -42,7 +42,7 @@ security:
 
         api:
             pattern: ^/
-            stateless: true
+            # stateless: true
             jwt: ~
         
     # Easy way to control access for large sections of your site

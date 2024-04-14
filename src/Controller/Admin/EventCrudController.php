@@ -116,7 +116,10 @@ class EventCrudController extends AbstractCrudController
                     CollectionField::new('guilds', 'Guildes')->useEntryCrudForm(NewEventGuildCrudController::class),
 
                     FormField::addTab('Facturables'),
-                    CollectionField::new('paymentables', 'Facturables')->useEntryCrudForm(NewEventPaymentableCrudController::class)
+                    CollectionField::new('paymentables', 'Facturables')->useEntryCrudForm(NewEventPaymentableCrudController::class),
+
+                    FormField::addTab('Evénements'),
+                    CollectionField::new('volunteerShifts', 'Bénévoles')->useEntryCrudForm(VolunteerShiftCrudController::class)->setTemplatePath('bundles/easyadmin/fields/event_volunteers.html.twig')
                 ];
                 break;
             case 'index':
