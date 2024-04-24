@@ -34,6 +34,7 @@ use App\Factory\ZoneFactory;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Config\Framework\SchedulerConfig;
 use function Zenstruck\Foundry\faker;
 
 class AppFixtures extends Fixture
@@ -63,6 +64,12 @@ class AppFixtures extends Fixture
             'name' => 'tmadmin',
             'email' => 'admin@dev.com',
             'roles' => ['ROLE_ADMIN'],
+        ]);
+
+        UserTMFactory::createOne([
+            'name' => 'elanndelh',
+            'email' => 'chef_projet_fanatique@yuno.host',
+            'roles' => ['ROLE_ADMIN', 'ROLE_LOBBYISTE'],
         ]);
 
         OrganizationFactory::createMany(3, function () {
@@ -274,6 +281,7 @@ class AppFixtures extends Fixture
             }
         }
 
+        
         RpgTableFactory::createMany(8, function () {
             $rpgActivity = RpgActivityFactory::random();
             $date = $this->getGoodDate($rpgActivity->object());
@@ -283,79 +291,95 @@ class AppFixtures extends Fixture
                 'start' => $date
             ];
         });
+
+        $rpg_tables = RpgTableFactory::all();
         
-        $duoRpg = [];
-        RpgReservationFactory::createMany(15, function  () use ($duoRpg) {
-          $registeredUser = rand(0, 1);
-          if ($registeredUser == 1) {
-              $user =  UserTMFactory::random();
-              $rpgTable = RpgTableFactory::random();
+        foreach ($rpg_tables as $table) {
+            $users =  UserTMFactory::randomRange(1, 10);
+            foreach ($users as $user) { 
+                $registeredUser = rand(0, 1);
+                if ($registeredUser == 1) {
+                    RpgReservationFactory::createOne(
+                        [
+                        'user' => $user,
+                        'email' => $user->getEmail(),
+                        'name' => $user->getName(),
+                        'phoneNumber' => $user->getTelephone(),
+                        'rpgTable' => $table
+                        ]
+                        );
+                    } else {
+                        RpgReservationFactory::createOne(
+                        [
+                            'rpgTable' => RpgTableFactory::random()
+                        ]);
+                    }        
+                }
+            }
 
-              while (in_array($user->getId().$rpgTable->getId(), $duoRpg)) {
-                $user =  UserTMFactory::random();
-                $rpgTable = RpgTableFactory::random();
-              }
-
-              $duoRpg[] = [$user->getId().$rpgTable->getId()];
-              return [
-                  'user' => $user,
-                  'email' => $user->getEmail(),
-                  'name' => $user->getName(),
-                  'phoneNumber' => $user->getTelephone(),
-                  'rpgTable' => $rpgTable
-              ];
-          } else {
-              return [
-                  'rpgTable' => RpgTableFactory::random()
-              ];
-          }
-        });
+        // foreach ($entertainment_schedules as $schedule) {
+        //     $users =  UserTMFactory::randomRange(1, 10);
+        //     foreach ($users as $user) {                        
+        //         $registeredUser = rand(0, 1);
+        //         if ($registeredUser == 1) {
+        //             EntertainmentReservationFactory::createOne(
+        //             [
+        //                 'user' => $user,
+        //                 'email' => $user->getEmail(),
+        //                 'name' => $user->getName(),
+        //                 'phoneNumber' => $user->getTelephone(),
+        //                 'entertainmentSchedule' => $schedule
+        //             ]);
+        //         } else {
+        //             EntertainmentReservationFactory::createOne( [
+        //                 'entertainmentSchedule' => $schedule
+        //             ]);
+        //         }
+        //     }
+        // }
 
         EntertainmentTypeFactory::createMany(5);
 
-        EntertainmentFactory::createMany(20, function () {
+        $entertainments = EntertainmentFactory::createMany(20, function () {
             return [
                 'entertainmentType' => EntertainmentTypeFactory::random(),
                 'zone' => ZoneFactory::random()
             ];
         });
 
-        EntertainmentScheduleFactory::createMany(30, function () {
-            $entairtenment = EntertainmentFactory::random();
-            $date = $this->getGoodDate($entairtenment->object());
+        foreach ($entertainments as $entertainment) {
+            EntertainmentScheduleFactory::createMany(rand(1, 3), function () use ($entertainment) {
+                $date = $this->getGoodDate($entertainment->object());
+                return [
+                    'entertainment' => $entertainment,
+                    'start' => $date
+                ];
+            });
+            
+        }
 
-            return [
-                'entertainment' => EntertainmentFactory::random(),
-                'start' => $date
-            ];
-        });
+        $entertainment_schedules = EntertainmentScheduleFactory::all();
 
-        $duoEntertainement = [];
-        EntertainmentReservationFactory::createMany(80, function () use ($duoEntertainement) {
-            $registeredUser = rand(0, 1);
-            if ($registeredUser == 1) {
-                $user =  UserTMFactory::random();
-                $entertainmentSchedule = EntertainmentScheduleFactory::random();
-
-                while (in_array($user->getId().$entertainmentSchedule->getId(), $duoEntertainement)) {
-                    $user = UserTMFactory::random();
-                    $entertainmentSchedule = EntertainmentScheduleFactory::random();
+        foreach ($entertainment_schedules as $schedule) {
+            $users =  UserTMFactory::randomRange(1, 10);
+            foreach ($users as $user) {                        
+                $registeredUser = rand(0, 1);
+                if ($registeredUser == 1) {
+                    EntertainmentReservationFactory::createOne(
+                    [
+                        'user' => $user,
+                        'email' => $user->getEmail(),
+                        'name' => $user->getName(),
+                        'phoneNumber' => $user->getTelephone(),
+                        'entertainmentSchedule' => $schedule
+                    ]);
+                } else {
+                    EntertainmentReservationFactory::createOne( [
+                        'entertainmentSchedule' => $schedule
+                    ]);
                 }
-
-                $duoEntertainement[] = $user->getId().$entertainmentSchedule->getId();
-                return [
-                    'user' => $user,
-                    'email' => $user->getEmail(),
-                    'name' => $user->getName(),
-                    'phoneNumber' => $user->getTelephone(),
-                    'entertainmentSchedule' => $entertainmentSchedule
-                ];
-            } else {
-                return [
-                    'entertainmentSchedule' => EntertainmentScheduleFactory::random()
-                ];
             }
-        });
+        }
 
         $manager->flush();
     }
