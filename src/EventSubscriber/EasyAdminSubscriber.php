@@ -1,7 +1,10 @@
 <?php
 
 namespace App\EventSubscriber;
+
+use App\Entity\Guild;
 use App\Entity\UserTM;
+use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityDeletedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface as EventSubscriberInterface;
@@ -22,7 +25,8 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     {
         return [
             BeforeEntityPersistedEvent::class => ['setPassword'],
-            BeforeEntityUpdatedEvent::class => ['setRoles']
+            BeforeEntityUpdatedEvent::class => ['setRoles'],
+            BeforeEntityDeletedEvent::class => ['unsetGuild']
         ];
     }
 
@@ -59,5 +63,19 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         }
 
         $entity->setRoles($roles);
+    }
+
+    public function unsetGuild(BeforeEntityDeletedEvent $event)
+    {
+        $entity = $event->getEntityInstance();
+
+        if (!($entity instanceof Guild)){
+            return;
+        }
+
+        $users = $entity->getUserTMs();
+        foreach ($users as $user) {
+            $user->setGuild(null);
+        }
     }
 }
