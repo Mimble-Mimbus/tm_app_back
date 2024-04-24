@@ -156,7 +156,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Evènements', 'fa-solid fa-calendar-days', Event::class);
         yield MenuItem::linkToCrud('Facturables', 'fa-solid fa-money-bill-wave', Paymentable::class);
         yield MenuItem::section('Lore');
-        yield MenuItem::linkToCrud('Guildes', 'fa-solid fa-shield', Guild::class);
+        yield MenuItem::linkToCrud('Guildes', 'fa-solid fa-shield', Guild::class)->setController(GuildCrudController::class);
         yield MenuItem::linkToCrud('Zones', 'fa-solid fa-map-location-dot', Zone::class);
         yield MenuItem::linkToCrud('RpgZone', 'fa-solid fa-dice-d20', RpgZone::class);
         yield MenuItem::linkToCrud('Quêtes', 'fa-solid fa-horse', Quest::class);

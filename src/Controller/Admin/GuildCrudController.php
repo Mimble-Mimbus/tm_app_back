@@ -79,7 +79,7 @@ class GuildCrudController extends AbstractCrudController
         $entity = new Guild;
         $entity->setPoints(0);
 
-        if ($this->filterEvent) {
+        if ($this->filterEvent != null) {
             $entity->setEvent($this->filterEvent);
         }
 
@@ -123,7 +123,8 @@ class GuildCrudController extends AbstractCrudController
                         $this->adminUrlGenerator
                         ->setController(GuildCrudController::class)
                         ->setAction('new')
-                        ->set('event', $this->filterEvent)
+                        ->set('event', $this->filterEvent->getId())
+                        ->unset('entityId')
                         ->generateUrl()
                     );
                 }
