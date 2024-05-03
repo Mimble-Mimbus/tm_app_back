@@ -16,7 +16,6 @@ use App\Entity\TriggerWarning;
 use App\Repository\RpgRepository;
 use App\Repository\TagRepository;
 use App\Repository\TriggerWarningRepository;
-use App\Service\ValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -28,8 +27,6 @@ use DateTime;
 #[Route('/api/apirest', name: 'api_')]
 class ActivitiesController extends AbstractController
 {
-    public function __construct(public ValidatorService $validatorService) {}
-
     #[Route('/event/{id}/activities', name: '/activities')]
     public function getActivities (Event $event) 
     {
@@ -50,8 +47,11 @@ class ActivitiesController extends AbstractController
 
                 $type = $entertainment->getEntertainmentType();
                 $entertainments[] = [
+                    'eventId' => $event->getId(),
+                    'zoneId' => $entertainment->getZone()->getId(),
                     'id' => $entertainment->getId(),
                     'name' => $entertainment->getName(),
+                    'description' => $entertainment->getDescription(),
                     'schedules' => $schedules,
                     'entertainmentType' => [
                         'id' => $type->getId(),
@@ -65,23 +65,44 @@ class ActivitiesController extends AbstractController
         $rpgActivities = [];
         
         foreach($event->getRpgZones() as $zone) {
+            $rpgZone = [
+                'id' => $zone->getId(),
+                'name' => $zone->getName(),
+                'eventId' => $zone->getEvent()->getId(),
+                'zone' => [
+                    'id' => $zone->getZone()->getId(),
+                    'name' => $zone->getZone()->getName()
+                ]
+            ];
             foreach($zone->getRpgActivities() as $activity) {
                 $rpgTables = [];
                 $user = $activity->getUserGm();
-
+                $rpg = $activity->getRpg();
                 foreach ($activity->getActivitySchedules() as $rpgTable) {
                     $rpgTables[] = [
                         'id' => $rpgTable->getId(),
                         'start' => $rpgTable->getStart(),
                         'duration' => $rpgTable->getDuration(),
-                        'availablesSeats' =>$rpgTable->getAvailableSeats()
+                        'availableSeats' =>$rpgTable->getAvailableSeats()
                     ];
                 }
 
+                $rpgObject = [
+                    'id' =>  $rpg->getId(),
+                    'description' => $rpg->getDescription(),
+                    'universe' => $rpg->getUniverse(),
+                    'publisher' => $rpg->getPublisher(),
+                    'name' => $rpg->getName(),
+                    'description' => $rpg->getDescription(),
+                ];
                 $rpgActivities[] = [
+                    'eventId' => $event->getId(),
+                    'rpgZoneId' => $activity->getRpgZone()->getId(),
                     'schedules' => $rpgTables,
+                    'description' => $activity->getDescription(),
                     'name' => $activity->getName(),
                     'id' => $activity->getId(),
+                    'rpg' => $rpgObject,
                     'userGm' => [
                         'id' => $user->getId(),
                         'name' => $user->getName(),
@@ -114,6 +135,8 @@ class ActivitiesController extends AbstractController
         $response = [
             'id' => $entertainment->getId(),
             'name' => $entertainment->getName(),
+            'zoneId' => $entertainment->getZone()->getId(),
+            'eventId' => $entertainment->getZone()->getEvent()->getId(),
             'description' => $entertainment->getDescription(),
             'schedules' => $schedules,
             'entertainmentType' => [
@@ -177,11 +200,22 @@ class ActivitiesController extends AbstractController
             ];
         }
         $user = $rpgActivity->getUserGm();
+        $rpg = $rpgActivity->getRpg();
         $response = [
+            'rpgZoneId' => $rpgActivity->getRpgZone()->getId(),
+            'eventId' => $rpgActivity->getRpgZone()->getEvent()->getId(),
             'id' => $rpgActivity->getId(),
             'name' => $rpgActivity->getName(),
             'description' => $rpgActivity->getDescription(),
             'schedules' => $schedules,
+            'rpg' => [
+                'id' =>  $rpg->getId(),
+                'description' => $rpg->getDescription(),
+                'universe' => $rpg->getUniverse(),
+                'publisher' => $rpg->getPublisher(),
+                'name' => $rpg->getName(),
+                'description' => $rpg->getDescription(),
+            ],
             'userGm' => [
                 'id' => $user->getId(),
                 'name' => $user->getName(),
