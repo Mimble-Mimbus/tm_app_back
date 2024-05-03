@@ -16,7 +16,6 @@ use App\Entity\TriggerWarning;
 use App\Repository\RpgRepository;
 use App\Repository\TagRepository;
 use App\Repository\TriggerWarningRepository;
-use App\Service\ValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -28,8 +27,6 @@ use DateTime;
 #[Route('/api/apirest', name: 'api_')]
 class ActivitiesController extends AbstractController
 {
-    public function __construct(public ValidatorService $validatorService) {}
-
     #[Route('/event/{id}/activities', name: '/activities')]
     public function getActivities (Event $event) 
     {
@@ -50,6 +47,7 @@ class ActivitiesController extends AbstractController
 
                 $type = $entertainment->getEntertainmentType();
                 $entertainments[] = [
+                    "zoneId" => $zone->getId(),
                     'id' => $entertainment->getId(),
                     'name' => $entertainment->getName(),
                     'schedules' => $schedules,
@@ -65,6 +63,15 @@ class ActivitiesController extends AbstractController
         $rpgActivities = [];
         
         foreach($event->getRpgZones() as $zone) {
+            $rpgZone = [
+                'id' => $zone->getId(),
+                'name' => $zone->getName(),
+                'eventId' => $zone->getEvent()->getId(),
+                'zone' => [
+                    'id' => $zone->getZone()->getId(),
+                    'name' => $zone->getZone()->getName()
+                ]
+            ];
             foreach($zone->getRpgActivities() as $activity) {
                 $rpgTables = [];
                 $user = $activity->getUserGm();
@@ -79,6 +86,7 @@ class ActivitiesController extends AbstractController
                 }
 
                 $rpgActivities[] = [
+                    'rpgZone'=> $rpgZone,
                     'schedules' => $rpgTables,
                     'name' => $activity->getName(),
                     'id' => $activity->getId(),
