@@ -47,9 +47,11 @@ class ActivitiesController extends AbstractController
 
                 $type = $entertainment->getEntertainmentType();
                 $entertainments[] = [
-                    "zoneId" => $zone->getId(),
+                    'eventId' => $event->getId(),
+                    'zoneId' => $entertainment->getZone()->getId(),
                     'id' => $entertainment->getId(),
                     'name' => $entertainment->getName(),
+                    'description' => $entertainment->getDescription(),
                     'schedules' => $schedules,
                     'entertainmentType' => [
                         'id' => $type->getId(),
@@ -75,21 +77,32 @@ class ActivitiesController extends AbstractController
             foreach($zone->getRpgActivities() as $activity) {
                 $rpgTables = [];
                 $user = $activity->getUserGm();
-
+                $rpg = $activity->getRpg();
                 foreach ($activity->getActivitySchedules() as $rpgTable) {
                     $rpgTables[] = [
                         'id' => $rpgTable->getId(),
                         'start' => $rpgTable->getStart(),
                         'duration' => $rpgTable->getDuration(),
-                        'availablesSeats' =>$rpgTable->getAvailableSeats()
+                        'availableSeats' =>$rpgTable->getAvailableSeats()
                     ];
                 }
 
+                $rpgObject = [
+                    'id' =>  $rpg->getId(),
+                    'description' => $rpg->getDescription(),
+                    'universe' => $rpg->getUniverse(),
+                    'publisher' => $rpg->getPublisher(),
+                    'name' => $rpg->getName(),
+                    'description' => $rpg->getDescription(),
+                ];
                 $rpgActivities[] = [
-                    'rpgZone'=> $rpgZone,
+                    'eventId' => $event->getId(),
+                    'rpgZoneId' => $activity->getRpgZone()->getId(),
                     'schedules' => $rpgTables,
+                    'description' => $activity->getDescription(),
                     'name' => $activity->getName(),
                     'id' => $activity->getId(),
+                    'rpg' => $rpgObject,
                     'userGm' => [
                         'id' => $user->getId(),
                         'name' => $user->getName(),
@@ -122,6 +135,8 @@ class ActivitiesController extends AbstractController
         $response = [
             'id' => $entertainment->getId(),
             'name' => $entertainment->getName(),
+            'zoneId' => $entertainment->getZone()->getId(),
+            'eventId' => $entertainment->getZone()->getEvent()->getId(),
             'description' => $entertainment->getDescription(),
             'schedules' => $schedules,
             'entertainmentType' => [
@@ -185,11 +200,22 @@ class ActivitiesController extends AbstractController
             ];
         }
         $user = $rpgActivity->getUserGm();
+        $rpg = $rpgActivity->getRpg();
         $response = [
+            'rpgZoneId' => $rpgActivity->getRpgZone()->getId(),
+            'eventId' => $rpgActivity->getRpgZone()->getEvent()->getId(),
             'id' => $rpgActivity->getId(),
             'name' => $rpgActivity->getName(),
             'description' => $rpgActivity->getDescription(),
             'schedules' => $schedules,
+            'rpg' => [
+                'id' =>  $rpg->getId(),
+                'description' => $rpg->getDescription(),
+                'universe' => $rpg->getUniverse(),
+                'publisher' => $rpg->getPublisher(),
+                'name' => $rpg->getName(),
+                'description' => $rpg->getDescription(),
+            ],
             'userGm' => [
                 'id' => $user->getId(),
                 'name' => $user->getName(),
