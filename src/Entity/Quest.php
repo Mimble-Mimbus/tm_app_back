@@ -36,6 +36,9 @@ class Quest
     #[ORM\Column]
     private ?int $points = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $type = null;
+
     #[ORM\Column]
     private ?bool $isSecret = null;
 
@@ -177,6 +180,18 @@ class Quest
                 $startedQuest->setQuest(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+          return $this->type;
+    }
+
+    public function setType (string $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }
