@@ -21,6 +21,8 @@ services:
             - '../src/Kernel.php'
 
     App\Service\ValidatorService:
+
+    App\Service\HelloAssoService:
     
     App\EventListener\UserTMListener:
         tags:
