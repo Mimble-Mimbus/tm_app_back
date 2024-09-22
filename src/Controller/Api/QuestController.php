@@ -30,6 +30,9 @@ class QuestController extends AbstractController
                   'name' => $zone->getName(),
               ],
               'type' => $quest->getType(),
+              'event' => [
+                  'id' => $event->getId()
+              ]
             ];
         }
 
@@ -48,6 +51,9 @@ class QuestController extends AbstractController
           'zone' => [
               'id' => $zone->getId(),
               'name' => $zone->getName(),
+          ],
+          'event' => [
+              'id' => $quest->getEvent()->getId(),
           ],
           'type' => $quest->getType(),
         ];

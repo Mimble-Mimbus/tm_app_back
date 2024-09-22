@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Event;
 use App\Entity\VolunteerShift;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -23,32 +22,33 @@ class VolunteerShiftRepository extends ServiceEntityRepository
     }
 
 
-   public function getShiftsForPlanning($event, $zone, $user): array
-   {
-    $query = $this->createQueryBuilder('v');
+    /** @return VolunteerShift[] */
+    public function getShiftsForPlanning($event, $zone, $user): array
+    {
+      $query = $this->createQueryBuilder('v');
 
-    if ($event != null) {
-        $query
-        ->andWhere('v.event = :event')
-        ->setParameter('event', $event);
-    }
+      if ($event != null) {
+          $query
+          ->andWhere('v.event = :event')
+          ->setParameter('event', $event);
+      }
 
-    if ($zone != null) {
-        $query->andWhere('v.zone = :zone')
-        ->setParameter('zone', $zone);
-    }
+      if ($zone != null) {
+          $query->andWhere('v.zone = :zone')
+          ->setParameter('zone', $zone);
+      }
 
-    if ($user != null) {
-        $query->andWhere('v.user = :user')
-        ->setParameter('user', $user);
+      if ($user != null) {
+          $query->andWhere('v.user = :user')
+          ->setParameter('user', $user);
+      }
+      
+      return $query
+            ->orderBy('v.shiftStart', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
     }
-    
-    return $query
-           ->orderBy('v.shiftStart', 'ASC')
-           ->getQuery()
-           ->getResult()
-       ;
-   }
 
 //    public function findOneBySomeField($value): ?VolunteerShift
 //    {
