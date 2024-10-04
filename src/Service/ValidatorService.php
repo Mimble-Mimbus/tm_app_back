@@ -5,18 +5,14 @@ namespace App\Service;
 use App\Exception\ConstraintException;
 use Exception;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 class ValidatorService  {
-    private ValidatorInterface $validator;
     public function __construct(
-        public RequestStack $requestStack
-    )
-    {
-        $this->validator = Validation::createValidatorBuilder()->enableAnnotationMapping()->getValidator();
-    }
+        public RequestStack $requestStack,
+        private ValidatorInterface $validator
+    ) {}
 
     public function validate (object $data) {
         $errors = $this->validator->validate($data);

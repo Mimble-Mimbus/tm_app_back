@@ -64,12 +64,14 @@ class AppFixtures extends Fixture
             'name' => 'tmadmin',
             'email' => 'admin@dev.com',
             'roles' => ['ROLE_ADMIN'],
+            'isVerified' => true
         ]);
 
         UserTMFactory::createOne([
             'name' => 'elanndelh',
             'email' => 'chef_projet_fanatique@yuno.host',
             'roles' => ['ROLE_ADMIN', 'ROLE_LOBBYISTE'],
+            'isVerified' => true
         ]);
 
         OrganizationFactory::createMany(3, function () {
@@ -199,16 +201,19 @@ class AppFixtures extends Fixture
 
         UserTMFactory::createMany(40, function () {
             $setGuild = rand(0, 1);
+            $isVerified = rand(0, 10);
             return [
                 'roles' => ['ROLE_USER', 'ROLE_VISITOR'],
-                'guild' => $setGuild == 1 ? GuildFactory::random() : null
+                'guild' => $setGuild == 1 ? GuildFactory::random() : null,
+                'isVerified' => $isVerified == 0 ? false : true,
             ];
         });
 
         $volunteers = UserTMFactory::createMany(40, function () {
             return [
                 'roles' => ['ROLE_USER', 'ROLE_VOLUNTEER'],
-                'guild' => null
+                'guild' => null,
+                'isVerified' => true,
             ];
         });
 

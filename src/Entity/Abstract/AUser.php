@@ -6,16 +6,19 @@ use App\Entity\Reporting;
 use App\Entity\VolunteerShift;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[MappedSuperclass]
 abstract class AUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\Email(message: "The email {{ value }} is not a valid email.")]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -27,6 +30,15 @@ abstract class AUser implements UserInterface, PasswordAuthenticatedUserInterfac
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[ORM\Column( options: ['default' => 0 ])]
+    private ?bool $isVerified = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $emailVerificationHashExpireAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $emailVerificationHash = null;
+
     /**
      * @var string The hashed password
      */
@@ -36,7 +48,7 @@ abstract class AUser implements UserInterface, PasswordAuthenticatedUserInterfac
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: VolunteerShift::class, orphanRemoval: true)]
     private Collection $volunteerShifts;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reporting::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reporting::class, cascade: ['remove'])]
     private Collection $reportings;
 
     public function __construct()
@@ -198,5 +210,41 @@ abstract class AUser implements UserInterface, PasswordAuthenticatedUserInterfac
     public function __toString()
     {
         return $this->name;
+    }
+
+    public function getIsVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getEmailVerificationHash(): ?string
+    {
+        return $this->emailVerificationHash;
+    }
+
+    public function setEmailVerificationHash(?string $emailVerificationHash): static
+    {
+        $this->emailVerificationHash = $emailVerificationHash;
+
+        return $this;
+    }
+
+    public function getEmailVerificationHashExpireAt(): ?\DateTimeInterface
+    {
+        return $this->emailVerificationHashExpireAt;
+    }
+
+    public function setEmailVerificationHashExpireAt(?\DateTimeInterface $emailVerificationHashExpireAt): static
+    {
+        $this->emailVerificationHashExpireAt = $emailVerificationHashExpireAt;
+
+        return $this;
     }
 }
