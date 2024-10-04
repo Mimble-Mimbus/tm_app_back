@@ -21,12 +21,22 @@ class UserTMRepository extends ServiceEntityRepository
         parent::__construct($registry, UserTM::class);
     }
 
-    public function getVolunteers() {
+    public function getVolunteers() 
+    {
         return $this->createQueryBuilder('u')
         ->andWhere('u.roles LIKE :role')
         ->setParameter('role', '%ROLE_VOLUNTEER%')
         ->getQuery()
         ->getResult();
+    }
+
+    public function getUserByHash (string $hash): ?UserTM
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.emailVerificationHash = :hash')
+            ->setParameter('hash', $hash)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
 //    /**

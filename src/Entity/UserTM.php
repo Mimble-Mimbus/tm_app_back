@@ -7,8 +7,11 @@ use App\Repository\UserTMRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserTMRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class UserTM extends AUser
 {
     #[ORM\Id]
@@ -16,13 +19,13 @@ class UserTM extends AUser
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: EntertainmentReservation::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: EntertainmentReservation::class, cascade: ['remove'])]
     private Collection $entertainmentReservations;
 
-    #[ORM\OneToMany(mappedBy: 'userGm', targetEntity: RpgActivity::class)]
+    #[ORM\OneToMany(mappedBy: 'userGm', targetEntity: RpgActivity::class, cascade: ['remove'])]
     private Collection $rpgActivities;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: RpgReservation::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: RpgReservation::class, cascade: ['remove'])]
     private Collection $rpgReservations;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
